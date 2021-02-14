@@ -1,6 +1,7 @@
 # OvgBlog 
-This is my blog project. 
-##Used Technologies and Technicals
+This is my blog project.
+ 
+## Used Technologies and Technicals
 - ASP.NET Core 3.1
 - ASP.NET MVC 6
 - Entity Framework Core 6
