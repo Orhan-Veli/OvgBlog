@@ -4,7 +4,6 @@ using OvgBlog.DAL.Abstract;
 using OvgBlog.DAL.Data.Entities;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OvgBlog.Business.Services
@@ -76,7 +75,7 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<IEnumerable<Article>>> GetAll()
         {
-            var list = await _articleRepository.GetAll();
+            var list = await _articleRepository.GetAll(null, x => x.User);
             return new Result<IEnumerable<Article>>(true, list);
         }
 
@@ -86,10 +85,24 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Article>(false, Message.IdIsNotValid);
             }
-            var articleEntity = await _articleRepository.Get(x => x.Id == id && !x.IsDeleted);
+            var articleEntity = await _articleRepository.Get((x => x.Id == id && !x.IsDeleted), (x => x.Comments));
             if(articleEntity==null)
             {
                 return new Result<Article>(false,Message.ArticleIsNotFound);
+            }
+            return new Result<Article>(true, articleEntity);
+        }
+
+        public async Task<IResult<Article>> GetBySeoUrl(string seoUrl)
+        {
+            if (string.IsNullOrEmpty(seoUrl))
+            {
+                return new Result<Article>(false, Message.FieldIsNotValid);
+            }
+            var articleEntity = await _articleRepository.Get((x => x.SeoUrl == seoUrl && !x.IsDeleted), (x => x.Comments));
+            if (articleEntity == null)
+            {
+                return new Result<Article>(false, Message.ArticleIsNotFound);
             }
             return new Result<Article>(true, articleEntity);
         }

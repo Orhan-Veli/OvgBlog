@@ -4,6 +4,12 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OvgBlog.Business.Abstract;
+using OvgBlog.Business.Services;
+using OvgBlog.DAL.Abstract;
+using OvgBlog.DAL.Concrete;
+using OvgBlog.DAL.Data;
+using OvgBlog.DAL.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +30,22 @@ namespace OvgBlog.UI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddSingleton<IArticleService, ArticleService>();
+            services.AddSingleton<ICategoryService, CategoryService>();
+            services.AddSingleton<ICommentService, CommentService>();
+            services.AddSingleton<ITagService, TagService>();
+            services.AddSingleton<IUserService, UserService>();
+
+            services.AddSingleton<IEntityRepository<User>, EntityRepository<User, OvgBlogContext>>();
+            services.AddSingleton<IEntityRepository<Article>, EntityRepository<Article, OvgBlogContext>>();
+            services.AddSingleton<IEntityRepository<Category>, EntityRepository<Category, OvgBlogContext>>();
+            services.AddSingleton<IEntityRepository<Tag>, EntityRepository<Tag, OvgBlogContext>>();
+            services.AddSingleton<IEntityRepository<Comment>, EntityRepository<Comment, OvgBlogContext>>();
+            services.AddSingleton<IEntityRepository<ArticleTagRelation>, EntityRepository<ArticleTagRelation, OvgBlogContext>>();
+            services.AddSingleton<IEntityRepository<ArticleCategoryRelation>, EntityRepository<ArticleCategoryRelation, OvgBlogContext>>();
+          
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

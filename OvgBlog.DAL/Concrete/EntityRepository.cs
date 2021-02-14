@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace OvgBlog.DAL.Concrete
 {
-    public class EntityRepository<TEntity, TContext> : IEntityRepository<TEntity> where TEntity : class,new() 
-        where TContext : DbContext,new()        
+    public class EntityRepository<TEntity, TContext> : IEntityRepository<TEntity> where TEntity : class, new()
+        where TContext : DbContext, new()
     {
         public async Task Create(TEntity entity)
         {
@@ -17,8 +17,8 @@ namespace OvgBlog.DAL.Concrete
             {
                 var addedEntity = context.Entry(entity);
                 addedEntity.State = EntityState.Added;
-              await context.SaveChangesAsync();
-            }           
+                await context.SaveChangesAsync();
+            }
         }
         public async Task Delete(Guid id)
         {
@@ -30,21 +30,35 @@ namespace OvgBlog.DAL.Concrete
             }
         }
 
-        public async Task<IEnumerable<TEntity>> GetAll(Expression<Func<TEntity, bool>> filter = null)
+        public async Task<IEnumerable<TEntity>> GetAll(Expression<Func<TEntity, bool>> filter = null, Expression<Func<TEntity, object>> includeFilter = null)
         {
+            IEnumerable<TEntity> result = null;
             using (TContext context = new TContext())
             {
-                return  filter == null 
-                    ? await context.Set<TEntity>().ToListAsync() 
-                    : await context.Set<TEntity>().Where(filter).ToListAsync();
+                if (filter == null)
+                {
+                    result = includeFilter == null
+                        ? await context.Set<TEntity>().ToListAsync()
+                        : await context.Set<TEntity>().Include(includeFilter).ToListAsync();
+                }
+                else
+                {
+                    result = includeFilter == null
+                        ? await context.Set<TEntity>().Where(filter).ToListAsync()
+                        : await context.Set<TEntity>().Where(filter).Include(includeFilter).ToListAsync();
+                }
+
+                return result;
             }
         }
 
-        public async Task<TEntity> Get(Expression<Func<TEntity, bool>> filter = null)
+        public async Task<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, Expression<Func<TEntity, object>> includeFilter = null)
         {
             using (TContext context = new TContext())
             {
-                return await context.Set<TEntity>().SingleOrDefaultAsync(filter);
+                return includeFilter == null
+                    ? await context.Set<TEntity>().SingleOrDefaultAsync(filter)
+                    : await context.Set<TEntity>().Include(includeFilter).SingleOrDefaultAsync(filter);
             }
         }
 
@@ -53,7 +67,7 @@ namespace OvgBlog.DAL.Concrete
             using (TContext context = new TContext())
             {
                 var updatedEntity = context.Entry(model);
-                updatedEntity.State = EntityState.Modified;                
+                updatedEntity.State = EntityState.Modified;
                 await context.SaveChangesAsync();
                 return updatedEntity.Entity;
             }

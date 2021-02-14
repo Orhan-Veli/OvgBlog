@@ -1,0 +1,35 @@
+﻿@model ArticleDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<section>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="p-5">
+                    <img class="img-fluid rounded-circle" src="~/@Model.ImageUrl" alt="">
+                </div>
+            </div>
+            <div class="col-lg-6 order-lg-1">
+                <div class="p-5">
+                    <h2 class="display-4">@Model.Title</h2>
+                    <p>@Model.Body</p>
+                    <br />
+                    <hr />
+                    <br />
+                    <p>Yazar: @Model.UserName  -  Tarih: @Model.CreatedDate.ToString("dd.MM.yyyy hh:MM")</p>
+                    <br />
+                    <hr />
+
+                    @foreach (var item in Model.Comments)
+                    {
+                        <p>Yorumu yazan: @item.Name - @item.Email</p>
+                        <p>Yorum: @item.Body</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

@@ -2,7 +2,6 @@
 using OvgBlog.DAL.Data.Entities;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OvgBlog.Business.Abstract
@@ -18,5 +17,6 @@ namespace OvgBlog.Business.Abstract
         Task<IResult<IEnumerable<Article>>> GetAll();
 
         Task<IResult<Article>> GetById(Guid id);
+        Task<IResult<Article>> GetBySeoUrl(string seoUrl);
     }
 }
