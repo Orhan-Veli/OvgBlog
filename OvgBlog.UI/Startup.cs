@@ -43,8 +43,8 @@ namespace OvgBlog.UI
             services.AddSingleton<IEntityRepository<Comment>, EntityRepository<Comment, OvgBlogContext>>();
             services.AddSingleton<IEntityRepository<ArticleTagRelation>, EntityRepository<ArticleTagRelation, OvgBlogContext>>();
             services.AddSingleton<IEntityRepository<ArticleCategoryRelation>, EntityRepository<ArticleCategoryRelation, OvgBlogContext>>();
-          
 
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
         }
 
