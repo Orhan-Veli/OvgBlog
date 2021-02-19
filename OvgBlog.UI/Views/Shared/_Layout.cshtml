@@ -43,7 +43,17 @@
         }
         .CategoryDesign:hover .dropdown-content {
             display: block;
-            opacity:0.6;
+            opacity:0.7;
+        }
+        .techs:hover {
+           
+            color: aqua;
+        }
+        .lang:hover {
+            color: aqua;
+        }
+        .me:hover {
+            color: aqua;
         }
        
     </style>
@@ -68,9 +78,9 @@
                         <div class="CategoryDesign">
                             <a href="#" class="nav-link">Kategoriler</a>
                             <div class="dropdown-content">
-                                <a href="#">asdgasg</a>
-                                <a href="#">asdgasg</a>
-                                <a href="#">asdgasg</a>                               
+                                <a href="@Url.Action("It","Category")" class="techs">TECHNOLOJİES</a>
+                                <a href="@Url.Action("Languages","Category")" class="lang">PROGRAMMING LANGUAGES</a>
+                                <a href="@Url.Action("AboutMe","Home")" class="me">ABOUT ME</a>
                             </div>
                         </div>
                     </li>

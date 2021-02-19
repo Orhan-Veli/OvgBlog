@@ -59,5 +59,11 @@ namespace OvgBlog.UI.Controllers
             var model = new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier };
             return View(model);
         }
+        [HttpGet]
+        public IActionResult AboutMe()
+        {
+
+            return View();
+        }
     }
 }

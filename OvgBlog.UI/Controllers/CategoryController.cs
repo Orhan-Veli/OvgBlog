@@ -19,16 +19,6 @@ namespace OvgBlog.UI.Controllers
             _categoryService = categoryService;
             _logger = logger;
         }
-        public async Task<IActionResult> GetListOfCategory()
-        {
-            var models = new List<CategoryNameViewModel>();
-            var result = await _categoryService.GetAll();
-            if (result.Success)
-            {
-                models = result.Data.Adapt<List<CategoryNameViewModel>>();
-            }            
-            return View(models.ToList());
-        }
         [HttpGet("Music")]
         public async Task<IActionResult> Music()
         {
@@ -46,6 +36,11 @@ namespace OvgBlog.UI.Controllers
         public async Task<IActionResult> It()
         {
 
+            return View();
+        }
+
+        public async Task<IActionResult> AboutMe()
+        {
 
             return View();
         }
