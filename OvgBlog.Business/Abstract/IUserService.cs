@@ -12,7 +12,7 @@ namespace OvgBlog.Business.Abstract
         Task<IResult<User>> Create(User user);
         Task<IResult<object>> Delete(Guid id);
         Task<IResult<User>> Update(User user);
-        Task<IResult<IEnumerable<User>>> GetAll();
         Task<IResult<User>> GetById(Guid id);
+        Task<IResult<User>> GetUser(string userName,string password);
     }
 }

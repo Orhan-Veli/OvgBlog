@@ -21,7 +21,7 @@ namespace OvgBlog.UI.Controllers
             _userService = userService;
         }
 
-
+        // ovgblog.com/article/yazinin-basligi
         //[Route("{seoUrl}")]
         public async Task<IActionResult> Index(string seoUrl)
         {

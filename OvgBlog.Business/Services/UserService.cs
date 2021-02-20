@@ -4,7 +4,7 @@ using OvgBlog.DAL.Abstract;
 using OvgBlog.DAL.Data.Entities;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OvgBlog.Business.Services
@@ -43,10 +43,19 @@ namespace OvgBlog.Business.Services
             return new Result<object>(true);
         }
 
-        public async Task<IResult<IEnumerable<User>>> GetAll()
+        public async Task<IResult<User>> GetUser(string  userName,string password)
         {
-            var list = await _userRepository.GetAll();
-            return new Result<IEnumerable<User>>(true,list);
+            if (userName ==null || password==null)
+            {
+                return new Result<User>(false,Message.UserNotFound);
+            }
+            var uName = await _userRepository.Get(x=> x.Name == userName || x.Email== userName);
+            var uPassword =await _userRepository.Get(x=> x.Password == password);
+            if (uName == null || uPassword== null)
+            {
+                return new Result<User>(false, Message.UserNotFound);
+            }
+            return new Result<User>(true);
         }
 
         public async Task<IResult<User>> GetById(Guid id)

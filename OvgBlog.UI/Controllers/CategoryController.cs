@@ -13,37 +13,31 @@ namespace OvgBlog.UI.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
-        private readonly ILogger _logger;
-        public CategoryController(ICategoryService categoryService,ILogger logger)
+        private readonly ILogger<CategoryController> _logger;
+        public CategoryController(ICategoryService categoryService,ILogger<CategoryController> logger)
         {
             _categoryService = categoryService;
             _logger = logger;
         }
-        [HttpGet("Music")]
-        public async Task<IActionResult> Music()
+        
+        public async Task<IActionResult> Index()
         {
-
-            return View();
-        }
-        [HttpGet("Languages")]
-        public async Task<IActionResult> Languages()
-        {
-
-
-            return View();
-        }
-        [HttpGet("It")]
-        public async Task<IActionResult> It()
-        {
-
+            //TODO: Kategorileri listeleyen sayfa yapılacak
             return View();
         }
 
-        public async Task<IActionResult> AboutMe()
+        //  ovgblog.com/category/music
+        [HttpGet("{seoUrl}")]
+        public async Task<IActionResult> Detail(string seoUrl)
         {
+            //TODO: 
+            //seoUrl'ye göre kategori bul (categoryId)
+            //bulduğun kategorinin yazılarını getir
+            //yazı listesini list model'e bind et
+            //yazi listesini döndür
+            ViewData["Title"] = "Kategori ismi"; //categoryEntity.Name
 
-            return View();
+            return View(); //yazı listesini dönecek
         }
-
     }
 }
