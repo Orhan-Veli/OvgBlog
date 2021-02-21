@@ -4,6 +4,7 @@ using OvgBlog.DAL.Abstract;
 using OvgBlog.DAL.Data.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OvgBlog.Business.Services
@@ -77,6 +78,16 @@ namespace OvgBlog.Business.Services
         {
             var list = await _articleRepository.GetAll(null, x => x.User);
             return new Result<IEnumerable<Article>>(true, list);
+        }
+
+        public async Task<IResult<IEnumerable<Article>>> GetByCategoryId(Guid categoryId)
+        {
+            if (categoryId==Guid.Empty)
+            {
+                return new Result<IEnumerable<Article>>(false, Message.IdIsNotValid);
+            }
+            var result = await _articleRepository.GetAll(x => x.ArticleCategoryRelations.Any(c => c.CategoryId == categoryId));
+            return new Result<IEnumerable<Article>>(true,result);
         }
 
         public async Task<IResult<Article>> GetById(Guid id)

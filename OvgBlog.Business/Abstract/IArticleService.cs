@@ -18,5 +18,7 @@ namespace OvgBlog.Business.Abstract
 
         Task<IResult<Article>> GetById(Guid id);
         Task<IResult<Article>> GetBySeoUrl(string seoUrl);
+
+        Task<IResult<IEnumerable<Article>>> GetByCategoryId(Guid categoryId);
     }
 }

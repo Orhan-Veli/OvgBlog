@@ -4,7 +4,7 @@ using OvgBlog.DAL.Abstract;
 using OvgBlog.DAL.Data.Entities;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OvgBlog.Business.Services
@@ -18,6 +18,21 @@ namespace OvgBlog.Business.Services
             _categoryRepository = categoryRepository;
             _articleRelationRepository = articleRelationRepository;
         }
+
+        public async Task<IResult<Category>> CategoryBySeoUrl(string seoUrl)
+        {
+            if (string.IsNullOrEmpty(seoUrl))
+            {
+                return new Result<Category>(false,Message.CategoryNotFound);
+            }
+            var category = await _categoryRepository.Get(x=>x.SeoUrl==seoUrl);
+            if (category==null)
+            {
+                return new Result<Category>(false,Message.CategoryNotFound);
+            }
+            return new Result<Category>(true, category);
+        }
+
         public async Task<IResult<Category>> Create(Category category)
         {
             if (category==null || string.IsNullOrEmpty(category.Name) || string.IsNullOrEmpty(category.SeoUrl))
@@ -55,7 +70,7 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<IEnumerable<Category>>> GetAll()
         {
-          var list = await _categoryRepository.GetAll();
+            var list = await _categoryRepository.GetAll();
             return new Result<IEnumerable<Category>>(true, list);
         }
 

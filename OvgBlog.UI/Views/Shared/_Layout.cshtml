@@ -75,15 +75,21 @@
                         <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
                     </li>
                     <li class="nav-item">
-                        <div class="CategoryDesign">
-                            <a href="#" class="nav-link">Kategoriler</a>
-                            <div class="dropdown-content">
-                                <a href="@Url.Action("It","Category")" class="techs">TECHNOLOJİES</a>
-                                <a href="@Url.Action("Languages","Category")" class="lang">PROGRAMMING LANGUAGES</a>
-                                <a href="@Url.Action("AboutMe","Home")" class="me">ABOUT ME</a>
-                            </div>
-                        </div>
+                        <a class="nav-link" asp-controller="Category" asp-action="Index">Kategoriler</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="AboutMe">Hakkımda</a>
+                    </li>
+                    @*<li class="nav-item">
+            <div class="CategoryDesign">
+                <a href="#" class="nav-link">Kategoriler</a>
+                <div class="dropdown-content">
+                    <a href="@Url.Action("It","Category")" class="techs">TECHNOLOJİES</a>
+                    <a href="@Url.Action("Languages","Category")" class="lang">PROGRAMMING LANGUAGES</a>
+                    <a href="@Url.Action("AboutMe","Home")" class="me">ABOUT ME</a>
+                </div>
+            </div>
+        </li>*@
                 </ul>
             </div>
         </div>

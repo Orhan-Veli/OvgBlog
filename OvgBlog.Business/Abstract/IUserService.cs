@@ -13,6 +13,6 @@ namespace OvgBlog.Business.Abstract
         Task<IResult<object>> Delete(Guid id);
         Task<IResult<User>> Update(User user);
         Task<IResult<User>> GetById(Guid id);
-        Task<IResult<User>> GetUser(string userName,string password);
+        Task<IResult<bool>> CheckUser(string userName,string password);
     }
 }

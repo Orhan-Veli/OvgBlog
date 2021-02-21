@@ -40,7 +40,7 @@ namespace OvgBlog.UI.Controllers
                 ViewData["ErrorMessage"] = "Tüm alanları eksiksiz doldurun!";
                 return View(model);
             }
-            var result = await _userService.GetUser(model.UserName,model.Password);
+            var result = await _userService.CheckUser(model.UserName,model.Password);
             if (!result.Success)
             {
                 ViewData["ErrorMessage"] = "Adınız ve ya şifreniz yanlıştır.";

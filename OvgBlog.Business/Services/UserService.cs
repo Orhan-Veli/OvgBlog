@@ -43,19 +43,22 @@ namespace OvgBlog.Business.Services
             return new Result<object>(true);
         }
 
-        public async Task<IResult<User>> GetUser(string  userName,string password)
+        public async Task<IResult<bool>> CheckUser(string  userName,string password)
         {
-            if (userName ==null || password==null)
+            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
-                return new Result<User>(false,Message.UserNotFound);
+                return new Result<bool>(false,Message.UserNotFound);
             }
-            var uName = await _userRepository.Get(x=> x.Name == userName || x.Email== userName);
-            var uPassword =await _userRepository.Get(x=> x.Password == password);
-            if (uName == null || uPassword== null)
+            var user = await _userRepository.Get(x=> x.Name == userName || x.Email== userName);
+            if(user == null || user.Name == null || user.Password== null)
             {
-                return new Result<User>(false, Message.UserNotFound);
+                return new Result<bool>(false, Message.UserNotFound);
             }
-            return new Result<User>(true);
+            if(user.Password != password)
+            {
+                return new Result<bool>(false, Message.PasswordIsWrong);
+            }
+            return new Result<bool>(true);
         }
 
         public async Task<IResult<User>> GetById(Guid id)

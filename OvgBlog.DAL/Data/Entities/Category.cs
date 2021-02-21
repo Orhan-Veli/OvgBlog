@@ -16,7 +16,7 @@ namespace OvgBlog.DAL.Data.Entities
 
         public string Name { get; set; }
         public string SeoUrl { get; set; }
-
+        public string ImageUrl { get; set; }
         public virtual ICollection<ArticleCategoryRelation> ArticleCategoryRelations { get; set; }
     }
 }

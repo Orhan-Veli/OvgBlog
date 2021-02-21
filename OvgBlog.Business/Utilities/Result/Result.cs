@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OvgBlog.Business.Constants
 {
-    public class Result<T> : IResult<T> where T:class
+    public class Result<T> : IResult<T>
     {
         public Result(bool success,string message,T data):this(success)
         {

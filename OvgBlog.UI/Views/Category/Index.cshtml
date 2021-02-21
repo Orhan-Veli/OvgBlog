@@ -1,6 +1,29 @@
-﻿@{
-    ViewData["Title"] = "Kategoriler";
+﻿@model List<CategoryListViewModel>
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    .Ctg
+    {
+        margin:100px 30px 200px 20px;
+        text-align:center;
+    }
 
-TODO: Kategoriler listelenecek
+</style>
+<div class="row Ctg">
+    @foreach (var item in Model)
+    {
+        <div class="col-lg-2 col-sm-6 portfolio-item">
+            <div class="card h-100">
+                <a asp-controller="Category" asp-action="Detail" asp-route-seoUrl="@item.SeoUrl"><img class="card-img-top" src="@item.ImageUrl" alt="" width="30"></a>
+                <div class="card-body">
+                    <h4 class="card-title" style="text-align:center; color:orangered !important">
+                        <a asp-controller="Category" asp-action="Detail" asp-route-seoUrl="@item.SeoUrl">@item.Name</a>
+                    </h4>
+                    @*<p class="card-text">pernatur eum quasi sapiente nesciunt? Voluptatibus sit, repellat sequi itaque deserunt, dolores in, nesciunt, illum tempora ex quae? Nihil, dolorem!</p>*@
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
