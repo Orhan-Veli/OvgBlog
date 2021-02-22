@@ -1,10 +1,11 @@
-﻿using System;
+﻿using FluentValidation;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace OvgBlog.Business.Validation.Abstract
 {
-    public interface IValidation
+    public interface IValidation:IValidator
     {
     }
 }

@@ -5,29 +5,28 @@ using OvgBlog.DAL.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OvgBlog.Business.Validation.Abstract
 {
-    public class FluentValidation<TValidation,TEntity>
-        where TValidation : class, new()
-        where TEntity : class,new()
+    public class FluentValidation<TValidate>:IValidationRepository<TValidate> where TValidate: class,IValidation,new()
+      
     {
-        public FluentValidation(IValidator validator,TEntity entity)
+        private readonly object baseEntity;
+        public FluentValidation(object entity)
         {
-            //To do Fix Tomorrow
-            //var context = new ValidationContext<object>(entity);
-            //TEntity entity1 = new TEntity();
-            //IValidation validation = new ArticleValidation();
-            //IValidation validation = new TValidation();
-            //ValidationResult result = validation.Validate(entity1);
-
-            //if (!result.IsValid)
-            //{
-            //    throw new ValidationException(result.Errors);
-            //}
-            
+            baseEntity = entity;
         }
-
+        public void GetValidate()
+        {
+           var context = new ValidationContext<object>(baseEntity);
+           TValidate validate = new TValidate();
+           ValidationResult result = validate.Validate(context);
+           if (!result.IsValid)
+           {
+             throw new ValidationException(result.Errors);
+           }
+        }
     }
    
 }

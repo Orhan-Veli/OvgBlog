@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OvgBlog.Business.Validation.Concrete
 {
-    public class ArticleValidation : AbstractValidator<Article>, IValidation
+    public class ArticleValidation : AbstractValidator<Article>,IValidation
     {
         public ArticleValidation()
         {
