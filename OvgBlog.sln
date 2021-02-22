@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OvgBlog.UI", "OvgBlog.UI\OvgBlog.UI.csproj", "{403C61B5-83FF-4020-9696-DA70B07AC7C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OvgBlog.UI", "OvgBlog.UI\OvgBlog.UI.csproj", "{403C61B5-83FF-4020-9696-DA70B07AC7C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OvgBlog.DAL", "OvgBlog.DAL\OvgBlog.DAL.csproj", "{F599D651-FEFB-4DB7-91CC-79449B914DB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OvgBlog.DAL", "OvgBlog.DAL\OvgBlog.DAL.csproj", "{F599D651-FEFB-4DB7-91CC-79449B914DB0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OvgBlog.Business", "OvgBlog.Business\OvgBlog.Business.csproj", "{D6C3078C-1F10-4BD0-B0AC-F3C5344D0C71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OvgBlog.Business", "OvgBlog.Business\OvgBlog.Business.csproj", "{D6C3078C-1F10-4BD0-B0AC-F3C5344D0C71}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

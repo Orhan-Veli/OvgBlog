@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OvgBlog.UI.Validations;
+using System;
 using System.Collections.Generic;
 
 namespace OvgBlog.UI.Models

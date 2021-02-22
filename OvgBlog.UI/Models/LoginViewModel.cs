@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace OvgBlog.UI.Models
 {
-    public class LoginViewController
+    public class LoginViewModel
     {
-        [Required(ErrorMessage ="Kullanıcı adı gereklidir.")]
         public string UserName { get; set; }
-
-        [Required(ErrorMessage ="Parola alanı gereklidir.")]
         public string Password { get; set; }
     }
 }

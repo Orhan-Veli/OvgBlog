@@ -32,10 +32,10 @@ namespace OvgBlog.UI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewController model)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             //TODO: BLL'de kullanıcı adı ve parolaya göre success dönen bir metod eklenebilir
-            if (!ModelState.IsValid || string.IsNullOrEmpty(model.UserName) || string.IsNullOrEmpty(model.Password))
+            if (!ModelState.IsValid)
             {
                 ViewData["ErrorMessage"] = "Tüm alanları eksiksiz doldurun!";
                 return View(model);
