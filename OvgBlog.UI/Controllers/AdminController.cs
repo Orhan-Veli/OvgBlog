@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OvgBlog.Business.Abstract;
+using OvgBlog.DAL.Data.Entities;
+using OvgBlog.UI.Extentions;
 using OvgBlog.UI.Models;
 using System;
 using System.Collections.Generic;
@@ -18,10 +20,13 @@ namespace OvgBlog.UI.Controllers
         private static bool isLogin = false;
         private readonly ILogger<AdminController> _logger;
         private readonly IUserService _userService;
-        public AdminController(ILogger<AdminController> logger, IUserService userService)
+        private readonly ICategoryService _categoryService;
+
+        public AdminController(ILogger<AdminController> logger, IUserService userService, ICategoryService categoryService)
         {
             _logger = logger;
             _userService = userService;
+            _categoryService = categoryService;
         }
 
         [HttpGet]
@@ -58,5 +63,29 @@ namespace OvgBlog.UI.Controllers
             else return RedirectToAction("Login");
         }
 
+        [HttpGet]
+        public IActionResult AddCategory()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async  Task<IActionResult> AddCategory(CategoryAddViewModel categoryAddViewModel)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(categoryAddViewModel);
+            }
+            categoryAddViewModel.SeoUrl = categoryAddViewModel.SeoUrl.ReplaceSeoUrl();
+            var result = await _categoryService.CategoryBySeoUrl(categoryAddViewModel.SeoUrl);
+            if (result.Success)
+            {
+                ModelState.AddModelError("SeoUrl", "SeoUrl is already taken");
+                return View(categoryAddViewModel);
+            }
+            var category =  categoryAddViewModel.Adapt<Category>();
+            await _categoryService.Create(category);
+            return RedirectToAction("Index");
+        }
     }
 }

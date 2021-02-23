@@ -33,12 +33,19 @@ namespace OvgBlog.Business.Services
             return new Result<Category>(true, category);
         }
 
+
         public async Task<IResult<Category>> Create(Category category)
         {
             if (category==null || string.IsNullOrEmpty(category.Name) || string.IsNullOrEmpty(category.SeoUrl))
             {
                 return new Result<Category>(false, Message.ModelNotValid);
             }
+            var result = await CategoryBySeoUrl(category.SeoUrl);
+            if (result.Success)
+            {
+                return new Result<Category>(false, Message.SeoUrlAlreadyTaken);
+            }
+            category.Id = Guid.NewGuid();
             await _categoryRepository.Create(category);
             return new Result<Category>(true,category);
             

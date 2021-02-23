@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OvgBlog.Business.Abstract;
 using OvgBlog.Business.Services;
-using OvgBlog.Business.Validation.Concrete;
 using OvgBlog.DAL.Abstract;
 using OvgBlog.DAL.Concrete;
 using OvgBlog.DAL.Data;
@@ -57,7 +56,7 @@ namespace OvgBlog.UI
             services.AddTransient<IValidator<ArticleListViewModel>, ArticleListViewModelValidator>();
             services.AddTransient<IValidator<CategoryListViewModel>, CategoryListViewModelValidator>();
             services.AddTransient<IValidator<CommentViewModel>, CommentViewModelValidator>();
-          
+            services.AddTransient<IValidator<CategoryAddViewModel>, CategoryAddViewModelValidator>();
 
             
         }
