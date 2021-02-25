@@ -22,6 +22,8 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Tag>(false, Message.ModelNotValid);
             }
+            tag.Id = Guid.NewGuid();
+            tag.CreatedDate = DateTime.Now;
             await _tagRepository.Create(tag);
             return new Result<Tag>(true, tag);
         }
@@ -45,7 +47,7 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<IEnumerable<Tag>>> GetAll()
         {
-            var list =await _tagRepository.GetAll();
+            var list =await _tagRepository.GetAll(x => !x.IsDeleted);
             return new Result<IEnumerable<Tag>>(true, list);
         }
 
@@ -74,6 +76,7 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Tag>(false,Message.TagNotFound);
             }
+            tag.UpdatedDate = DateTime.Now;
             tagEntity = await _tagRepository.Update(tag);
             return new Result<Tag>(true,tagEntity);
         }

@@ -22,8 +22,11 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<User>(false,Message.ModelNotValid);
             }
+            user.Id = Guid.NewGuid();
+            user.CreatedDate = DateTime.Now;
             await _userRepository.Create(user);
             return new Result<User>(true,user);
+
         }
 
         public async Task<IResult<object>> Delete(Guid id)
@@ -86,6 +89,7 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<User>(false,Message.UserNotFound);
             }
+            user.UpdatedDate = DateTime.Now;
             userEntity = await _userRepository.Update(user);
             return new Result<User>(true, userEntity);
         }

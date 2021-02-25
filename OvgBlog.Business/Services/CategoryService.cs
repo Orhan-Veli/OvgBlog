@@ -46,6 +46,7 @@ namespace OvgBlog.Business.Services
                 return new Result<Category>(false, Message.SeoUrlAlreadyTaken);
             }
             category.Id = Guid.NewGuid();
+            category.CreatedDate = DateTime.Now;
             await _categoryRepository.Create(category);
             return new Result<Category>(true,category);
             
@@ -69,7 +70,7 @@ namespace OvgBlog.Business.Services
                 item.DeletedDate = DateTime.Now;
                 await _articleRelationRepository.Update(item);
             }
-            categoryEntity.IsDeleted = false;
+            categoryEntity.IsDeleted = true;
             categoryEntity.DeletedDate = DateTime.Now;
            await _categoryRepository.Update(categoryEntity);
             return new Result<object>(true);
@@ -77,7 +78,7 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<IEnumerable<Category>>> GetAll()
         {
-            var list = await _categoryRepository.GetAll();
+            var list = await _categoryRepository.GetAll(x=> !x.IsDeleted);
             return new Result<IEnumerable<Category>>(true, list);
         }
 
@@ -106,6 +107,7 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Category>(false, Message.CategoryNotFound);
             }
+            category.UpdatedDate = DateTime.Now;
             categoryEntity = await _categoryRepository.Update(category);
             return new Result<Category>(true, categoryEntity);
         }

@@ -29,7 +29,9 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Comment>(false,Message.CommentNotFound);
             }
-           await _commentRepository.Create(comment);
+            comment.Id = Guid.NewGuid();
+            comment.CreatedDate = DateTime.Now;
+            await _commentRepository.Create(comment);
             return new Result<Comment>(true, comment);
         }
 
@@ -57,7 +59,7 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<IEnumerable<Comment>>> GetAll()
         {
-          var list = await _commentRepository.GetAll();
+          var list = await _commentRepository.GetAll(x => !x.IsDeleted);
             return new Result<IEnumerable<Comment>>(true,list);
         }
 
@@ -91,6 +93,7 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Comment>(false, Message.CommentNotFound);
             }
+            comment.UpdatedDate = DateTime.Now;
             commentEntity =await _commentRepository.Update(comment);
             return new Result<Comment>(true, commentEntity);
 

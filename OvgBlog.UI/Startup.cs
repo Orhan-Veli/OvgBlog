@@ -57,6 +57,7 @@ namespace OvgBlog.UI
             services.AddTransient<IValidator<CategoryListViewModel>, CategoryListViewModelValidator>();
             services.AddTransient<IValidator<CommentViewModel>, CommentViewModelValidator>();
             services.AddTransient<IValidator<CategoryAddViewModel>, CategoryAddViewModelValidator>();
+            services.AddTransient<IValidator<ArticleAddViewModel>, ArticleAddViewModelValidator>();
 
             
         }

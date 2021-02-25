@@ -25,16 +25,19 @@ namespace OvgBlog.Business.Services
         }
         public async Task<IResult<Article>> Create(Article article)
         {
-            if (article==null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl) || article.UserId==Guid.Empty)
+            if (article==null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl) || article.Id==Guid.Empty)
             {
                 return new Result<Article>(false,Message.ModelNotValid);
             }
+            article.UserId= Guid.Parse("B992346C-E0CC-4EBA-A16B-2B915BB73A51");
             var userEntity = await _userRepository.Get(x => x.Id == article.UserId && !x.IsDeleted); 
             if (userEntity==null)
             {
                 return new Result<Article>(false, Message.UserNotFound);
-            }
-           await _articleRepository.Create(article);
+            }            
+            article.Id = Guid.NewGuid();
+            article.CreatedDate=DateTime.Now;
+            await _articleRepository.Create(article);
            return new Result<Article>(true,article);
         }
 
@@ -77,6 +80,7 @@ namespace OvgBlog.Business.Services
         public async Task<IResult<IEnumerable<Article>>> GetAll()
         {
             var list = await _articleRepository.GetAll(null, x => x.User);
+            list.Where(x => !x.IsDeleted);
             return new Result<IEnumerable<Article>>(true, list);
         }
 
@@ -134,6 +138,7 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Article>(false, Message.UserNotFound);
             }
+            article.UpdatedDate = DateTime.Now;
             articleEntity = await _articleRepository.Update(article);
             return new Result<Article>(true,articleEntity);
         }
