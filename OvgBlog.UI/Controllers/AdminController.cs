@@ -13,11 +13,10 @@ using System.Threading.Tasks;
 
 namespace OvgBlog.UI.Controllers
 {
+   [Authorize]
     public class AdminController : Controller
     {
-        //TODO: Authorize attribute eklenecek ve isLogin silinecek
         //TODO(proje sonunda yapılacak): Parola encripyt  1234 --> as54dfgfdgd65dfgd778_'r34dfgfd 
-        private static bool isLogin = false;
         private readonly ILogger<AdminController> _logger;
         private readonly IUserService _userService;
         private readonly ICategoryService _categoryService;
@@ -30,39 +29,12 @@ namespace OvgBlog.UI.Controllers
             _categoryService = categoryService;
             _articleService = articleService;
         }
-
-        [HttpGet]
-        public IActionResult Login()
-        {
-            ViewData["ErrorMessage"] = null;
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            //TODO: BLL'de kullanıcı adı ve parolaya göre success dönen bir metod eklenebilir
-            if (!ModelState.IsValid)
-            {
-                ViewData["ErrorMessage"] = "Tüm alanları eksiksiz doldurun!";
-                return View(model);
-            }
-            var result = await _userService.CheckUser(model.UserName,model.Password);
-            if (!result.Success)
-            {
-                ViewData["ErrorMessage"] = "Adınız ve ya şifreniz yanlıştır.";
-                return View();
-            }
-            isLogin = true;
-            return RedirectToAction("Index");
-        }
-
         //[OvgAuthorize]
         [HttpGet]
         public IActionResult Index()
         {
-            if (isLogin) return View();
-            else return RedirectToAction("Login");
+            return View();
+            
         }
 
         [HttpGet]

@@ -1,5 +1,6 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -51,7 +52,7 @@ namespace OvgBlog.UI
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddMvc().AddFluentValidation();
 
-            services.AddTransient<IValidator<LoginViewModel>, LoginViewModelValidator>();
+           
             services.AddTransient<IValidator<ArticleDetailViewModel>, ArticleDetailViewModelValidator>();
             services.AddTransient<IValidator<ArticleListViewModel>, ArticleListViewModelValidator>();
             services.AddTransient<IValidator<CategoryListViewModel>, CategoryListViewModelValidator>();
@@ -59,13 +60,30 @@ namespace OvgBlog.UI
             services.AddTransient<IValidator<CategoryAddViewModel>, CategoryAddViewModelValidator>();
             services.AddTransient<IValidator<ArticleAddViewModel>, ArticleAddViewModelValidator>();
 
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
+
+            });
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            {
+                options.Cookie.Name = "AUTHCOOKIE";
+                options.LoginPath = "/Login";
+
+            });
+
+            services.AddRazorPages();
             
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -78,8 +96,10 @@ namespace OvgBlog.UI
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+           
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
@@ -88,6 +108,8 @@ namespace OvgBlog.UI
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapRazorPages();
             });
         }
     }

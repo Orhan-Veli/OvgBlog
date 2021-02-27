@@ -35,7 +35,7 @@ namespace OvgBlog.UI.Controllers
         }
 
         //  ovgblog.com/category/music
-        [HttpGet("{seoUrl}")]
+        [HttpGet("Category/{seoUrl}")]
         public async Task<IActionResult> Detail(string seoUrl)
         {
             ViewData["Title"] = "Kategori";
