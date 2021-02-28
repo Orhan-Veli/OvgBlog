@@ -23,6 +23,7 @@ namespace OvgBlog.UI.Controllers
 
         // ovgblog.com/article/yazinin-basligi
         //[Route("{seoUrl}")]
+        [HttpGet]
         public async Task<IActionResult> Index(string seoUrl)
         {
             if (string.IsNullOrEmpty(seoUrl))

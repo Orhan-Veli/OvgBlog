@@ -1,31 +1,145 @@
-﻿@model List<ArticleListViewModel>
+﻿@model HomeViewModel
 @{
     ViewData["Title"] = "Ana Sayfa";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    int i = 0;
 }
 
-@foreach (var item in Model)
-{
-    string rightClass = (i % 2 == 0) ? "order-lg-2" : "";
-    <section>
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 @rightClass">
-                    <div class="p-5">
-                        <img class="img-fluid rounded-circle" src="~/@item.ImageUrl" alt="">
+<!-- page header -->
+<header id="home" class="header">
+    <div class="overlay"></div>
+    <div class="header-content container">
+        <h1 class="header-title">
+            <span class="up">Merhaba!</span>
+            <span class="down">Ben Orhan Veli</span>
+        </h1>
+        <p class="header-subtitle">BACKEND DEVELOPER</p>
+
+        <a href="#" class="btn btn-primary">GitHub</a>
+    </div>
+</header>
+<!-- end of page header -->
+<!-- about section -->
+<section class="section pt-0" id="about">
+    <!-- container -->
+    <div class="container text-center">
+        <!-- about wrapper -->
+        <div class="about">
+            <div class="about-img-holder">
+                <img src="~/uploads/Foto.jpg" class="about-img" alt="" style="border-radius: 50%;">
+            </div>
+            <div class="about-caption">
+                <p class="section-subtitle">Ben Kimim ?</p>
+                <h2 class="section-title mb-3">Hakkımda</h2>
+                <p class="LongText">
+                    Ben Orhan, bir oyun şirketinde Game&Level Designer olarak çalışmaktayım. Backend yazılım konusunda ASP.NET CORE,MVC,Entity Frameworkcore, MsSql ve git gibi güncel teknolojiler hakkında eğitim alarak, bu bağlamda bireysel çalışmalar yürütmekteyim. Çalışmalarımı SOLID prensiplerine uygun olarak tasarlamaktayım.<br /><br />
+
+                    Saygılarımla,<br /><br />
+
+                    Orhan Veli GÖĞEBAKAN<br />
+
+                </p>
+                @*<button class="btn-rounded btn btn-outline-primary mt-4">Download CV</button>*@
+            </div>
+        </div><!-- end of about wrapper -->
+    </div><!-- end of container -->
+</section>
+<!-- end of about section -->
+<!-- service section -->
+<section class="section" id="service">
+    <div class="container text-center">
+        <p class="section-subtitle">Neler Var ?</p>
+        <h6 class="section-title mb-6">Kategoriler</h6>
+        <!-- row -->
+        <div class="row">
+            @foreach (var item in Model.Categories)
+            {
+                <div class="col-md-6 col-lg-3">
+                    <div class="service-card">
+                        <div class="body">
+                            <img src="~/@item.ImageUrl" alt="@item.Name" class="icon">
+                            <h6 class="title">@item.Name</h6>
+                            <p class="subtitle">
+                                <a href="@Url.Action("Detail", "Category", new { seoUrl = item.SeoUrl })">Yazıları görüntüle</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-6 order-lg-1">
-                    <div class="p-5">
-                        <h2 class="display-4">
-                            <a asp-controller="Article" asp-action="Index" asp-route-seoUrl="@item.SeoUrl">@item.Title</a>
-                        </h2>
-                        <p>@item.Body</p>
-                    </div>
+            }
+        </div><!-- end of row -->
+    </div>
+</section>
+<!-- end of service section -->
+<!-- section -->
+<section class="section-sm bg-primary">
+    <!-- container -->
+    <div class="container text-center text-sm-left">
+        <!-- row -->
+        <div class="row align-items-center">
+            <div class="col-sm offset-md-1 mb-4 mb-md-0">
+                <h6 class="title text-light">Benimle çalışmak ister misin?</h6>
+                <p class="m-0 text-light">Benimle iletişime geçmek için formu doldurabilirsin.</p>
+            </div>
+            <div class="col-sm offset-sm-2 offset-md-3">
+                <a href="#contact" class="btn btn-lg my-font btn-light rounded">Forma Git</a>
+            </div>
+        </div> <!-- end of row -->
+    </div> <!-- end of container -->
+</section>
+<!-- end of section -->
+<!-- blog section -->
+<section class="section" id="blog">
+    <!-- container -->
+    <div class="container text-center">
+        @*<p class="section-subtitle">Son Yazılar</p>*@
+        <h6 class="section-title mb-6">Son Yazılar</h6>
+        @foreach (var item in Model.Articles)
+        {
+            <!-- blog-wrapper -->
+            <div class="blog-card">
+                <div class="blog-card-header">
+                    <img src="~/@item.ImageUrl" class="blog-card-img" alt="@item.Title">
+                </div>
+                <div class="blog-card-body">
+                    <h5 class="blog-card-title">@item.Title</h5>
+
+                    <p class="blog-card-caption">
+                        <a href="javascript:;"><i class="fa fa-user-circle-o"></i> Yazar: Admin</a>
+                        <a href="javascript:;"><i class="fa fa-calendar-o"></i> Tarih: @item.CreatedDate?.ToString("dd.MM.yyyy")</a>
+                    </p>
+
+                    <p>@item.Body</p>
+
+                    <a asp-controller="Article" asp-action="Index" asp-route-seoUrl="@item.SeoUrl" class="blog-card-link">Devamını oku <i class="ti-angle-double-right"></i></a>
                 </div>
             </div>
-        </div>
-    </section>
-   i++;
-}
+            <!-- end of blog wrapper -->
+        }
+
+    </div><!-- end of container -->
+</section>
+<!-- end of blog section -->
+<!-- contact section -->
+<section class="section" id="contact">
+    <div class="container text-center">
+        <p class="section-subtitle">Benimle nasıl iletişime geçmek istersin?</p>
+        <h6 class="section-title mb-5">İletişim Formu</h6>
+        <!-- contact form -->
+        <form action="" class="contact-form col-md-10 col-lg-8 m-auto">
+            <div class="form-row">
+                <div class="form-group col-sm-6">
+                    <input type="text" size="50" class="form-control" placeholder="Ad Soyad" required>
+                </div>
+                <div class="form-group col-sm-6">
+                    <input type="email" class="form-control" placeholder="E-posta" requried>
+                </div>
+                <div class="form-group col-sm-12">
+                    <textarea name="comment" id="comment" rows="6" class="form-control" placeholder="Bir şeyler yaz"></textarea>
+                </div>
+                <div class="form-group col-sm-12 mt-3">
+                    <input type="submit" value="Gönder" class="btn btn-outline-primary rounded">
+                </div>
+            </div>
+        </form><!-- end of contact form -->
+    </div><!-- end of container -->
+</section>
+<!-- end of contact section -->

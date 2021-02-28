@@ -4,36 +4,79 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<section>
-    <style>
+<!-- Page Header -->
+<header class="header header-mini">
+    <div class="header-title">@Model.Title</div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Ana Sayfaya Git</a></li>
+            @*<li class="breadcrumb-item active" aria-current="page">Components</li>*@
+        </ol>
+    </nav>
+</header>
+<!-- End Of Page Header -->
 
-    </style>
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div class="p-5">
-                    <img class="img-fluid rounded-circle" src="~/@Model.ImageUrl" alt="">
-                </div>
-            </div>
-            <div class="col-lg-6 order-lg-1">
-                <div class="p-5">
-                    <h2 class="display-4">@Model.Title</h2>
-                    <p>@Model.Body</p>
-                    <br />
-                    <hr />
-                    <br />
-                    <p>Yazar: @Model.UserName  -  Tarih: @Model.CreatedDate.ToString("dd.MM.yyyy hh:MM")</p>
-                    <br />
-                    <hr />
+<div class="container">
+    <h3 class="mt-5">@Model.Title</h3>
+    <p class="blog-card-caption">
+        <a href="javascript:;"><i class="fa fa-user-circle-o"></i> Yazar: Admin</a>
+        <a href="javascript:;"><i class="fa fa-calendar-o"></i> Tarih: @Model.CreatedDate.ToString("dd.MM.yyyy")</a>
+    </p>
+    <img src="~/@Model.ImageUrl" style="width: 100%;" />
+    <p>
+        @Model.Body
+    </p>
 
-                    @foreach (var item in Model.Comments)
-                    {
-                        <p>Yorumu yazan: @item.Name - @item.Email</p>
-                        <p>Yorum: @item.Body</p>
-                    }
-                </div>
+    <!-- testimonial section -->
+    <section class="section" id="testmonial">
+        <div class="container text-center">
+            <h6 class="section-title mb-6">Yorumlar</h6>
+            <!-- row -->
+            <div class="row">
+                @foreach (var item in Model.Comments)
+                {
+                    <div class="col-md-6">
+                        <div class="testimonial-card">
+                            <div class="testimonial-card-img-holder">
+                                <img src="~/uploads/DefaultCategory.png" class="testimonial-card-img" alt="@item.Name">
+                            </div>
+                            <div class="testimonial-card-body">
+                                <p class="testimonial-card-subtitle">@item.Body</p>
+                                <h6 class="testimonial-card-title">@item.Name - @item.Email</h6>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
-    </div>
-</section>
+        <!-- end of container -->
+    </section>
+    <!-- end of testimonial section -->
+
+    <!-- contact section -->
+    <section class="section" id="contact">
+        <div class="container text-center">
+            <p class="section-subtitle">Yazı hakkında yorum yazmak ister misin?</p>
+            <h6 class="section-title mb-5">Yorumunu Yaz</h6>
+            <!-- contact form -->
+            <form action="" class="contact-form col-md-10 col-lg-8 m-auto">
+                <div class="form-row">
+                    <div class="form-group col-sm-6">
+                        <input type="text" size="50" class="form-control" placeholder="Ad Soyad" required>
+                    </div>
+                    <div class="form-group col-sm-6">
+                        <input type="email" class="form-control" placeholder="E-posta" requried>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <textarea name="comment" id="comment" rows="6" class="form-control" placeholder="Bir şeyler yaz"></textarea>
+                    </div>
+                    <div class="form-group col-sm-12 mt-3">
+                        <input type="submit" value="Gönder" class="btn btn-outline-primary rounded">
+                    </div>
+                </div>
+            </form><!-- end of contact form -->
+        </div><!-- end of container -->
+    </section>
+    <!-- end of contact section -->
+</div>
 

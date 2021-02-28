@@ -5,130 +5,84 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="author" content="Orhan Veli GÖĞEBAKAN">
 
     <title>@ViewData["Title"] - OVG Blog</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="~/lib/theme/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom fonts for this template -->
-    <link href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="~/lib/theme/css/one-page-wonder.min.css" rel="stylesheet">
-
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="~/lib/bootstrap-toastr/toastr.css" rel="stylesheet" asp-append-version="true" />
 
-    <style>
-        .CategoryDesign {
-            position: relative;
-            display: inline-block;
-        }
+    <!-- Custom fonts for this template -->
+    <link rel="stylesheet" href="~/meyawo/vendors/themify-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="~/meyawo/css/meyawo.css">
 
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            min-width: 160px;
-            z-index: 1;
-        }
-
-            .dropdown-content a {
-                float: none;
-                color: white;
-                padding: 12px 16px;
-                text-decoration: none;
-                display: block;
-                text-align: left;
-            }
-
-        .CategoryDesign:hover .dropdown-content {
-            display: block;
-            opacity: 0.7;
-        }
-
-        .techs:hover {
-            color: aqua;
-        }
-
-        .lang:hover {
-            color: aqua;
-        }
-
-        .me:hover {
-            color: aqua;
-        }
-    </style>
+    @RenderSection("styles", required: false)
 
 </head>
 
-<body>
+<body data-spy="scroll" data-target=".navbar" data-offset="40" id="home">
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+    <!-- Page Navbar -->
+    <nav class="custom-navbar" data-spy="affix" data-offset-top="20">
         <div class="container">
-            <a class="navbar-brand" asp-controller="Home" asp-action="Index">OVG Blog</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Category" asp-action="Index">Kategoriler</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="AboutMe">Hakkımda</a>
-                    </li>
-                    @*<li class="nav-item">
-                            <div class="CategoryDesign">
-                                <a href="#" class="nav-link">Kategoriler</a>
-                                <div class="dropdown-content">
-                                    <a href="@Url.Action("It","Category")" class="techs">TECHNOLOJİES</a>
-                                    <a href="@Url.Action("Languages","Category")" class="lang">PROGRAMMING LANGUAGES</a>
-                                    <a href="@Url.Action("AboutMe","Home")" class="me">ABOUT ME</a>
-                                </div>
-                            </div>
-                        </li>*@
-                </ul>
-            </div>
+            <a class="logo" href="#">OVG Blog</a>
+            <ul class="nav">
+                <li class="item">
+                    <a class="link" href="@Url.Action("Index", "Home")">Ana Sayfa</a>
+                </li>
+                <li class="item">
+                    <a class="link" href="@Url.Action("Index", "Home")#about">Hakkımda</a>
+                </li>
+                <li class="item">
+                    <a class="link" href="@Url.Action("Index", "Home")#service">Kategoriler</a>
+                </li>
+                <li class="item">
+                    <a class="link" href="@Url.Action("Index", "Home")#contact">İletişim</a>
+                </li>
+            </ul>
+            <a href="javascript:void(0)" id="nav-toggle" class="hamburger hamburger--elastic">
+                <div class="hamburger-box">
+                    <div class="hamburger-inner"></div>
+                </div>
+            </a>
         </div>
     </nav>
-
-    <header class="masthead text-center text-white">
-        <div class="masthead-content">
-            <div class="container">
-                <h1 class="masthead-heading mb-0">Orhan Veli</h1>
-                <h2 class="masthead-subheading mb-0">GÖĞEBAKAN</h2>
-                @*<a href="#" class="btn btn-primary btn-xl rounded-pill mt-5">Learn More</a>*@
-            </div>
-        </div>
-        <div class="bg-circle-1 bg-circle"></div>
-        <div class="bg-circle-2 bg-circle"></div>
-        <div class="bg-circle-3 bg-circle"></div>
-        <div class="bg-circle-4 bg-circle"></div>
-    </header>
-
+    <!-- End of Page Navbar -->
+    
     @RenderBody()
+    
+    <!-- footer -->
+    <div class="container">
+        <footer class="footer">
+            <p class="mb-0">
+                Copyright
+                <script>document.write(new Date().getFullYear())</script> &copy; <a href="javascript:;">OVG Blog</a>
+            </p>
+            <div class="social-links text-right m-auto ml-sm-auto">
+                <a href="javascript:void(0)" class="link"><i class="ti-facebook"></i></a>
+                <a href="javascript:void(0)" class="link"><i class="ti-twitter-alt"></i></a>
+                <a href="javascript:void(0)" class="link"><i class="ti-google"></i></a>
+                <a href="javascript:void(0)" class="link"><i class="ti-pinterest-alt"></i></a>
+                <a href="javascript:void(0)" class="link"><i class="ti-instagram"></i></a>
+                <a href="javascript:void(0)" class="link"><i class="ti-rss"></i></a>
+            </div>
+        </footer>
+    </div> 
+    <!-- end of page footer -->
 
-    <!-- Footer -->
-    <footer class="py-5 bg-black">
-        <div class="container">
-            <p class="m-0 text-center text-white small">Copyright &copy; @DateTime.Now.Year OVG Blog </p>
-        </div>
-        <!-- /.container -->
-    </footer>
+    <!-- core  -->
+    <script src="~/meyawo/vendors/jquery/jquery-3.4.1.js"></script>
+    <script src="~/meyawo/vendors/bootstrap/bootstrap.bundle.js"></script>
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="~/lib/theme/vendor/jquery/jquery.min.js"></script>
-    <script src="~/lib/theme/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- bootstrap 3 affix -->
+    <script src="~/meyawo/vendors/bootstrap/bootstrap.affix.js"></script>
 
-    <script src="~/SBAdmin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Meyawo js -->
+    <script src="~/meyawo/js/meyawo.js"></script>
 
-    @RenderSection("Scripts", required: false)
+    <script src="~/lib/bootstrap-toastr/toastr.min.js" asp-append-version="true"></script>
+
+    @RenderSection("scripts", required: false)
 </body>
-
 </html>

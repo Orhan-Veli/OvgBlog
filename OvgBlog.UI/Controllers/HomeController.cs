@@ -14,38 +14,41 @@ namespace OvgBlog.UI.Controllers
     public class HomeController : Controller
     {
         private readonly IArticleService _articleService;
-
+        private readonly ICategoryService _categoryService;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger, IArticleService articleService)
+        public HomeController(ILogger<HomeController> logger, IArticleService articleService, ICategoryService categoryService)
         {
             _logger = logger;
             _articleService = articleService;
+            _categoryService = categoryService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var models = new List<ArticleListViewModel>();
+            var model = new HomeViewModel();
 
+            var articleList = new List<ArticleListViewModel>();
             var response = await _articleService.GetAll();
             if (response.Success)
             {
-                /*
-                models = response.Result.Data.Select(x => new ArticleListViewModel
-                {
-                    Id = x.Id,
-                    Title = x.Title,
-                    Body = x.Body?.Substring(0, 100) + " ...",
-                    ImageUrl = x.ImageUrl,
-                    SeoUrl = x.SeoUrl
-                }).ToList();
-                */
-
-                models = response.Data.Adapt<List<ArticleListViewModel>>();
-                models.ForEach(item => item.Body = item.Body?.Substring(0, 100) + " ...");
+                articleList = response.Data.Adapt<List<ArticleListViewModel>>();
+                articleList.ForEach(item => item.Body = item.Body?.Length > 100
+                                    ? (item.Body?.Substring(0, 100)?.ToString() ?? "") + " ..."
+                                    : item.Body);
             }
+            model.Articles = articleList.Take(10).ToList();
 
-            return View(models.Take(10).ToList());
+            var categoryList = new List<CategoryListViewModel>();
+            var categoryResult = await _categoryService.GetAll();
+            if (categoryResult.Success && categoryResult.Data != null)
+            {
+                categoryList = categoryResult.Data.Adapt<List<CategoryListViewModel>>();
+                categoryList.Where(x => x.ImageUrl == null).ToList().ForEach(item => item.ImageUrl = "uploads/DefaultCategory.png");
+            }
+            model.Categories = categoryList;
+
+            return View(model);
         }
 
         public IActionResult Categories()
