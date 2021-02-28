@@ -29,7 +29,7 @@ namespace OvgBlog.UI.Controllers
             _categoryService = categoryService;
             _articleService = articleService;
         }
-        //[OvgAuthorize]
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -38,7 +38,7 @@ namespace OvgBlog.UI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CategoryListView()
+        public async Task<IActionResult> CategoryList()
         {
             var entity = await _categoryService.GetAll();
             var categoryList = entity.Data.Adapt<List<CategoryListViewModel>>();
@@ -104,40 +104,51 @@ namespace OvgBlog.UI.Controllers
             return RedirectToAction("CategoryListView");
         }
 
-        [HttpGet]
+        [HttpDelete]
         public async Task<IActionResult> DeleteCategory(Guid id)
         {
-            if (id==Guid.Empty)
+            if(id == Guid.Empty)
             {
-                ModelState.AddModelError(string.Empty,"Id is not found.");
-                return RedirectToAction("CategoryListView");
+                return Json(new JsonResultModel(false, "Geçersiz kategori id"));
             }
-            var result = await _categoryService.GetById(id);
-            if (result.Data == null)
-            {
-                return RedirectToAction("CategoryListView");
-            }
-            return View("DeleteCategory");
+            var deleteResult = await _categoryService.Delete(id);
+            return Json(new JsonResultModel(deleteResult.Success, deleteResult.Message));
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> DeleteCategory(Guid id)
+        //{
+        //    if (id==Guid.Empty)
+        //    {
+        //        ModelState.AddModelError(string.Empty,"Id is not found.");
+        //        return RedirectToAction("CategoryListView");
+        //    }
+        //    var result = await _categoryService.GetById(id);
+        //    if (result.Data == null)
+        //    {
+        //        return RedirectToAction("CategoryListView");
+        //    }
+        //    return View("DeleteCategory");
+        //}
 
-        [HttpPost]
-        public async Task<IActionResult> DeleteCategory(CategoryListViewModel categoryListViewModel)
-        {
-            if (categoryListViewModel.Id == Guid.Empty)
-            {
-                ModelState.AddModelError(string.Empty, "Id is not valid");
-                return RedirectToAction("CategoryListView");
-            }
-            var result = await _categoryService.GetById(categoryListViewModel.Id);
-            if (result.Data == null)
-            {
-                ModelState.AddModelError(string.Empty, "There is no category with that id.");
-                return RedirectToAction("CategoryListView");
-            }
-            await _categoryService.Delete(categoryListViewModel.Id);
-            return View("Index");
-        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> DeleteCategory(CategoryListViewModel categoryListViewModel)
+        //{
+        //    if (categoryListViewModel.Id == Guid.Empty)
+        //    {
+        //        ModelState.AddModelError(string.Empty, "Id is not valid");
+        //        return RedirectToAction("CategoryListView");
+        //    }
+        //    var result = await _categoryService.GetById(categoryListViewModel.Id);
+        //    if (result.Data == null)
+        //    {
+        //        ModelState.AddModelError(string.Empty, "There is no category with that id.");
+        //        return RedirectToAction("CategoryListView");
+        //    }
+        //    await _categoryService.Delete(categoryListViewModel.Id);
+        //    return View("Index");
+        //}
         [HttpGet]
         public IActionResult AddArticle()
         {
@@ -165,7 +176,7 @@ namespace OvgBlog.UI.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> ArticleListView()
+        public async Task<IActionResult> ArticleList()
         {
           var list = await _articleService.GetAll();
           var articleList = list.Data.Adapt<List<ArticleListViewModel>>();

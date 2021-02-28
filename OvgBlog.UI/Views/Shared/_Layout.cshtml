@@ -18,44 +18,47 @@
 
     <!-- Custom styles for this template -->
     <link href="~/lib/theme/css/one-page-wonder.min.css" rel="stylesheet">
+
+    <link href="~/lib/bootstrap-toastr/toastr.css" rel="stylesheet" asp-append-version="true" />
+
     <style>
-        .CategoryDesign
-        {
-           position:relative;
-           display:inline-block;
-
+        .CategoryDesign {
+            position: relative;
+            display: inline-block;
         }
 
-        .dropdown-content
-        {
-            display:none;
-            position:absolute;
-            min-width:160px;
-            z-index:1;
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            min-width: 160px;
+            z-index: 1;
         }
-        .dropdown-content a{
-            float:none;
-            color:white;
-            padding:12px 16px;
-            text-decoration:none;
-            display:block;
-            text-align:left;
-        }
+
+            .dropdown-content a {
+                float: none;
+                color: white;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+                text-align: left;
+            }
+
         .CategoryDesign:hover .dropdown-content {
             display: block;
-            opacity:0.7;
+            opacity: 0.7;
         }
+
         .techs:hover {
-           
             color: aqua;
         }
+
         .lang:hover {
             color: aqua;
         }
+
         .me:hover {
             color: aqua;
         }
-       
     </style>
 
 </head>
@@ -69,7 +72,7 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse"  id="navbarResponsive">
+            <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
@@ -81,15 +84,15 @@
                         <a class="nav-link" asp-controller="Home" asp-action="AboutMe">Hakkımda</a>
                     </li>
                     @*<li class="nav-item">
-            <div class="CategoryDesign">
-                <a href="#" class="nav-link">Kategoriler</a>
-                <div class="dropdown-content">
-                    <a href="@Url.Action("It","Category")" class="techs">TECHNOLOJİES</a>
-                    <a href="@Url.Action("Languages","Category")" class="lang">PROGRAMMING LANGUAGES</a>
-                    <a href="@Url.Action("AboutMe","Home")" class="me">ABOUT ME</a>
-                </div>
-            </div>
-        </li>*@
+                            <div class="CategoryDesign">
+                                <a href="#" class="nav-link">Kategoriler</a>
+                                <div class="dropdown-content">
+                                    <a href="@Url.Action("It","Category")" class="techs">TECHNOLOJİES</a>
+                                    <a href="@Url.Action("Languages","Category")" class="lang">PROGRAMMING LANGUAGES</a>
+                                    <a href="@Url.Action("AboutMe","Home")" class="me">ABOUT ME</a>
+                                </div>
+                            </div>
+                        </li>*@
                 </ul>
             </div>
         </div>
@@ -122,6 +125,9 @@
     <!-- Bootstrap core JavaScript -->
     <script src="~/lib/theme/vendor/jquery/jquery.min.js"></script>
     <script src="~/lib/theme/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/SBAdmin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
     @RenderSection("Scripts", required: false)
 </body>
 

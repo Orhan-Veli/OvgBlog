@@ -47,11 +47,6 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<object>(false,Message.IdIsNotValid);
             }
-            var userEntity = await _userRepository.Get(x => x.Id == id && !x.IsDeleted);
-            if (userEntity == null)
-            {
-                return new Result<object>(false, Message.UserNotFound);
-            }
             var articleEntity = await _articleRepository.Get(x => x.Id == id && !x.IsDeleted);
             if (articleEntity == null)
             {
@@ -79,8 +74,7 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<IEnumerable<Article>>> GetAll()
         {
-            var list = await _articleRepository.GetAll(null, x => x.User);
-            list.Where(x => !x.IsDeleted);
+            var list = await _articleRepository.GetAll(x => !x.IsDeleted, x => x.User);
             return new Result<IEnumerable<Article>>(true, list);
         }
 
