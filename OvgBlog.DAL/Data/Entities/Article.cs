@@ -10,6 +10,7 @@ namespace OvgBlog.DAL.Data.Entities
     {
         public Article()
         {
+            ArticleTagRelations = new HashSet<ArticleTagRelation>();
             ArticleCategoryRelations = new HashSet<ArticleCategoryRelation>();
             Comments = new HashSet<Comment>();
         }
@@ -24,5 +25,6 @@ namespace OvgBlog.DAL.Data.Entities
         public virtual User User { get; set; }
         public virtual ICollection<ArticleCategoryRelation> ArticleCategoryRelations { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<ArticleTagRelation> ArticleTagRelations { get; set; }
     }
 }

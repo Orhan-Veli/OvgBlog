@@ -12,5 +12,6 @@
         public static string TagNotFound="Tag is not found";
         public static string PasswordIsWrong="Password is wrong. Please try again.";
         public static string SeoUrlAlreadyTaken="You have this SeoUrl.";
+        public static string NameNotFound="Name not found.";
     }
 }

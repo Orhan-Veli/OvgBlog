@@ -45,6 +45,20 @@ namespace OvgBlog.Business.Services
             return new Result<object>(true);
         }
 
+        public async Task<IResult<Tag>> FindIdByName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return new Result<Tag>(false,Message.NameNotFound);
+            }
+            var result = await _tagRepository.Get(x => x.Name == name && !x.IsDeleted);
+            if (result == null)
+            {
+                return new Result<Tag>(false, Message.TagNotFound);
+            }
+            return new Result<Tag>(true,result);
+        }
+
         public async Task<IResult<IEnumerable<Tag>>> GetAll()
         {
             var list =await _tagRepository.GetAll(x => !x.IsDeleted);

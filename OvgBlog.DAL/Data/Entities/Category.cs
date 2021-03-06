@@ -12,8 +12,6 @@ namespace OvgBlog.DAL.Data.Entities
         {
             ArticleCategoryRelations = new HashSet<ArticleCategoryRelation>();
         }
-
-
         public string Name { get; set; }
         public string SeoUrl { get; set; }
         public string ImageUrl { get; set; }

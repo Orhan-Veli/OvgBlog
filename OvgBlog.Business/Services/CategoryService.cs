@@ -76,6 +76,20 @@ namespace OvgBlog.Business.Services
             return new Result<object>(true);
         }
 
+        public async Task<IResult<Category>> FindCategoryIdByName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return new Result<Category>(false,Message.NameNotFound);
+            }
+            var category = await _categoryRepository.Get(x => x.Name == name && !x.IsDeleted);
+            if (category == null)
+            {
+                return new Result<Category>(false,Message.CategoryNotFound);
+            }
+            return new Result<Category>(true, category);
+        }
+
         public async Task<IResult<IEnumerable<Category>>> GetAll()
         {
             var list = await _categoryRepository.GetAll(x=> !x.IsDeleted);

@@ -38,7 +38,6 @@ namespace OvgBlog.UI.Controllers
                                     : item.Body);
             }
             model.Articles = articleList.Take(10).ToList();
-
             var categoryList = new List<CategoryListViewModel>();
             var categoryResult = await _categoryService.GetAll();
             if (categoryResult.Success && categoryResult.Data != null)

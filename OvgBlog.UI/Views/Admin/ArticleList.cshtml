@@ -2,19 +2,19 @@
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-<head>
+<!--<head>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>-->
     <!------ Include the above in your HEAD tag ---------->
-    <style>
+    <!--<style>
         .PositionOfSign {
             margin-right: 10px;
         }
     </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-</head>
+</head>-->
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -23,11 +23,10 @@
                 <table id="mytable" class="table table-bordred table-striped">
                     <thead>
                         @*<th><input type="checkbox" id="checkall" /></th>*@
-                    <th>Id</th>
-                    <th>Body</th>
+                    <th>Title</th>
                     <th>SeoUrl</th>
                     <th>Image</th>
-                    <th>Title</th>
+                    <th>Body</th>
                     <th>Edit</th>
                     <th>Delete</th>
                     </thead>
@@ -37,11 +36,10 @@
 
                             <tr>
                                 @*<td><input type="checkbox" class="checkthis" /></td>*@
-                                <td>@item.Id</td>
-                                <td>@item.Body</td>
+                                <td>@item.Title</td>
                                 <td>@item.SeoUrl</td>
                                 <td>@item.ImageUrl</td>
-                                <td>@item.Title</td>
+                                <td>@item.Body</td>
                             <form method="post">
                                 <td><a class="button-container" asp-route-Id="@item.Id" asp-action="UpdateArticle" name="@item.Id" type="button"><img src="/uploads/Edit.png" width="20px"></a></td>
                                 <td><a class="button-container" asp-route-Id="@item.Id" asp-action="DeleteArticle" name="@item.Id" type="button"><img src="/uploads/Delete.png" width="20px"></a></td>

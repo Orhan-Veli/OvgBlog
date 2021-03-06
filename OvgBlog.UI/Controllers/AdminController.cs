@@ -9,6 +9,7 @@ using OvgBlog.UI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace OvgBlog.UI.Controllers
@@ -21,13 +22,15 @@ namespace OvgBlog.UI.Controllers
         private readonly IUserService _userService;
         private readonly ICategoryService _categoryService;
         private readonly IArticleService _articleService;
-
-        public AdminController(ILogger<AdminController> logger, IUserService userService, ICategoryService categoryService, IArticleService articleService)
+        private readonly ITagService _tagService;
+       
+        public AdminController(ILogger<AdminController> logger, IUserService userService, ICategoryService categoryService, IArticleService articleService, ITagService tagService)
         {
             _logger = logger;
             _userService = userService;
             _categoryService = categoryService;
             _articleService = articleService;
+            _tagService = tagService;            
         }
 
         [HttpGet]
@@ -48,6 +51,7 @@ namespace OvgBlog.UI.Controllers
         [HttpGet]
         public IActionResult AddCategory()
         {
+           var key = User.Claims.FirstOrDefault(x=> x.Type== ClaimTypes.Name).Value;
             return View();
         }
 
@@ -67,7 +71,7 @@ namespace OvgBlog.UI.Controllers
             }
             var category =  categoryAddViewModel.Adapt<Category>();
             await _categoryService.Create(category);
-            return RedirectToAction("CategoryListView");
+            return RedirectToAction("CategoryList");
         }
 
         [HttpGet]
@@ -150,28 +154,65 @@ namespace OvgBlog.UI.Controllers
         //    return View("Index");
         //}
         [HttpGet]
-        public IActionResult AddArticle()
+        public async Task<IActionResult> AddArticle()
         {
-            return View();
+            var model = new ArticleAddViewModel();
+            var result = await _categoryService.GetAll();
+            model.CategoryList = result.Data.ToList().Adapt<List<CategoryListViewModel>>();
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddArticle(ArticleAddViewModel articleAddViewModel)
+        public async Task<IActionResult> AddArticle(ArticleAddViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(articleAddViewModel);
+                return View(model);
             }
-            articleAddViewModel.SeoUrl = articleAddViewModel.SeoUrl.ReplaceSeoUrl();
-            var result = await _articleService.GetBySeoUrl(articleAddViewModel.SeoUrl);
-            if (result.Success)
+
+            model.SeoUrl = model.SeoUrl.ReplaceSeoUrl();           
+            var result = await _articleService.GetBySeoUrl(model.SeoUrl);
+            if (result.Success && result.Data != null)
             {
                 ModelState.AddModelError("SeoUrl", "SeoUrl is already taken");
-                return View(articleAddViewModel);
+                return View(model);
             }
-            var article = articleAddViewModel.Adapt<Article>();
+
+            var tags = model.TagName.Split(",");
+            var article = model.Adapt<Article>();
+            for (int i = 0; i < tags.Length; i++)
+            {
+                var tagRelation = new ArticleTagRelation
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedDate = DateTime.Now
+                };
+
+                var getTag = await _tagService.FindIdByName(tags[i]);
+                if(getTag != null)
+                {
+                    tagRelation.TagId = getTag.Data.Id;
+                }
+                else
+                {
+                    tagRelation.Tag = new Tag
+                    {
+                        Id = Guid.NewGuid(),
+                        CreatedDate = DateTime.Now
+                    };
+                }
+                article.ArticleTagRelations.Add(tagRelation);               
+            }
+
+            article.ArticleCategoryRelations.Add(new ArticleCategoryRelation
+            {
+                Id = Guid.NewGuid(),
+                CategoryId = model.CategoryId,
+                CreatedDate = DateTime.Now
+            });
+
             await _articleService.Create(article);
-            return View();
+            return RedirectToAction("Index");
         }
 
 

@@ -15,5 +15,7 @@ namespace OvgBlog.Business.Abstract
         Task<IResult<Tag>> Update(Tag tag);
         Task<IResult<IEnumerable<Tag>>> GetAll();
         Task<IResult<Tag>> GetById(Guid id);
+
+        Task<IResult<Tag>> FindIdByName(string name);
     }
 }

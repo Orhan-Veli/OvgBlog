@@ -15,7 +15,7 @@ namespace OvgBlog.Business.Services
         readonly IEntityRepository<User> _userRepository;
         readonly IEntityRepository<ArticleTagRelation> _tagRelationRepository;
         readonly IEntityRepository<ArticleCategoryRelation> _categoryRelationRepository;
-        public ArticleService(IEntityRepository<Article> articleRepository, IEntityRepository<User> userRepository, 
+        public ArticleService(IEntityRepository<Article> articleRepository, IEntityRepository<User> userRepository,
             IEntityRepository<ArticleTagRelation> tagRelationRepository, IEntityRepository<ArticleCategoryRelation> categoryRelationRepository)
         {
             _articleRepository = articleRepository;
@@ -25,27 +25,43 @@ namespace OvgBlog.Business.Services
         }
         public async Task<IResult<Article>> Create(Article article)
         {
-            if (article==null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl) || article.Id==Guid.Empty)
+            if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl) || article.Id == Guid.Empty)
             {
-                return new Result<Article>(false,Message.ModelNotValid);
+                return new Result<Article>(false, Message.ModelNotValid);
             }
-            article.UserId= Guid.Parse("B992346C-E0CC-4EBA-A16B-2B915BB73A51");
-            var userEntity = await _userRepository.Get(x => x.Id == article.UserId && !x.IsDeleted); 
-            if (userEntity==null)
+
+            article.UserId = Guid.Parse("B992346C-E0CC-4EBA-A16B-2B915BB73A51");
+            var userEntity = await _userRepository.Get(x => x.Id == article.UserId && !x.IsDeleted);
+            if (userEntity == null)
             {
                 return new Result<Article>(false, Message.UserNotFound);
-            }            
+            }
+
             article.Id = Guid.NewGuid();
-            article.CreatedDate=DateTime.Now;
+            article.CreatedDate = DateTime.Now;
             await _articleRepository.Create(article);
-           return new Result<Article>(true,article);
+
+            try
+            {
+                await _categoryRelationRepository.Create(new ArticleCategoryRelation { Id = Guid.NewGuid(), ArticleId = article.Id, CategoryId = article.ArticleCategoryRelations.FirstOrDefault().CategoryId, CreatedDate = DateTime.Now });
+                foreach (var item in article.ArticleTagRelations)
+                {
+                    await _tagRelationRepository.Create(new ArticleTagRelation { Id = Guid.NewGuid(), TagId = item.TagId, ArticleId = article.Id, CreatedDate = DateTime.Now });
+                }
+            }
+            catch (Exception ex)
+            {
+                await _articleRepository.Delete(article.Id);
+            }
+
+            return new Result<Article>(true, article);
         }
 
         public async Task<IResult<object>> Delete(Guid id)
         {
-            if (id==Guid.Empty)
+            if (id == Guid.Empty)
             {
-                return new Result<object>(false,Message.IdIsNotValid);
+                return new Result<object>(false, Message.IdIsNotValid);
             }
             var articleEntity = await _articleRepository.Get(x => x.Id == id && !x.IsDeleted);
             if (articleEntity == null)
@@ -57,9 +73,9 @@ namespace OvgBlog.Business.Services
             {
                 item.IsDeleted = true;
                 item.DeletedDate = DateTime.Now;
-              await _tagRelationRepository.Update(item);
+                await _tagRelationRepository.Update(item);
             }
-            var categoryEntities = await _categoryRelationRepository.GetAll(x=> x.ArticleId == articleEntity.Id && !x.IsDeleted);
+            var categoryEntities = await _categoryRelationRepository.GetAll(x => x.ArticleId == articleEntity.Id && !x.IsDeleted);
             foreach (var item in categoryEntities)
             {
                 item.IsDeleted = true;
@@ -80,24 +96,24 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<IEnumerable<Article>>> GetByCategoryId(Guid categoryId)
         {
-            if (categoryId==Guid.Empty)
+            if (categoryId == Guid.Empty)
             {
                 return new Result<IEnumerable<Article>>(false, Message.IdIsNotValid);
             }
             var result = await _articleRepository.GetAll(x => x.ArticleCategoryRelations.Any(c => c.CategoryId == categoryId));
-            return new Result<IEnumerable<Article>>(true,result);
+            return new Result<IEnumerable<Article>>(true, result);
         }
 
         public async Task<IResult<Article>> GetById(Guid id)
         {
-            if (id==Guid.Empty)
+            if (id == Guid.Empty)
             {
                 return new Result<Article>(false, Message.IdIsNotValid);
             }
             var articleEntity = await _articleRepository.Get((x => x.Id == id && !x.IsDeleted), (x => x.Comments));
-            if(articleEntity==null)
+            if (articleEntity == null)
             {
-                return new Result<Article>(false,Message.ArticleIsNotFound);
+                return new Result<Article>(false, Message.ArticleIsNotFound);
             }
             return new Result<Article>(true, articleEntity);
         }
@@ -118,12 +134,12 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<Article>> Update(Article article)
         {
-            if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl) || article.UserId == Guid.Empty || article.Id==Guid.Empty)
+            if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl) || article.UserId == Guid.Empty || article.Id == Guid.Empty)
             {
                 return new Result<Article>(false, Message.ModelNotValid);
             }
             var articleEntity = await _articleRepository.Get(x => x.Id == article.Id && !x.IsDeleted);
-            if (articleEntity==null)
+            if (articleEntity == null)
             {
                 return new Result<Article>(false, Message.ArticleIsNotFound);
             }
@@ -134,7 +150,7 @@ namespace OvgBlog.Business.Services
             }
             article.UpdatedDate = DateTime.Now;
             articleEntity = await _articleRepository.Update(article);
-            return new Result<Article>(true,articleEntity);
+            return new Result<Article>(true, articleEntity);
         }
     }
 }

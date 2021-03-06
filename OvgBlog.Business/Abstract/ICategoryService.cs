@@ -21,5 +21,7 @@ namespace OvgBlog.Business.Abstract
 
         Task<IResult<Category>> CategoryBySeoUrl(string seoUrl);
 
+        Task<IResult<Category>> FindCategoryIdByName(string name);
+
     }
 }

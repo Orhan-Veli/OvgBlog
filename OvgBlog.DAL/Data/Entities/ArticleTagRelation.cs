@@ -11,7 +11,7 @@ namespace OvgBlog.DAL.Data.Entities
         public Guid TagId { get; set; }
         public Guid ArticleId { get; set; }
 
-        public virtual ArticleCategoryRelation Article { get; set; }
+        public virtual Article Article { get; set; }
         public virtual Tag Tag { get; set; }
     }
 }
