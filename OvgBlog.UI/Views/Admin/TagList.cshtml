@@ -1,0 +1,98 @@
+﻿@model List<TagViewModel>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section styles {
+    <style type="text/css">
+        .PositionOfSign {
+            margin-right: 10px;
+        }
+    </style>
+}
+<body>
+    <div class="container">
+        <div class="row">
+
+
+            <div class="col-md-12">
+                <div id="PlaceHolderElement"></div>
+                @*<h4>Category Table <span><a asp-action="AddCategory" class="PositionOfSign" type="button"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>*@
+                <h4>Tag Table <span><a type="button" class="PositionOfSign" data-toggle="ajax-modal" data-target="#myModal"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>
+                <div class="table-responsive">
+                    <table id="mytable" class="table table-bordred table-striped">
+                        <thead>
+                        <th>Name</th>
+                        <th>SeoUrl</th>             
+                        </thead>
+                        <tbody>
+                            @{
+                                int i = 1;
+                                foreach (var item in Model)
+                                {
+                                    <tr id="row-@i">
+                                        <td>@item.Name</td>
+                                        <td>@item.SeoUrl</td>                                        
+                                        <td>                                           
+                                            <a href="javascript:;" onclick="DeleteCategory('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a>
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" style="margin:10px; margin-right:110px">Category Ekle</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <p>Category Name</p><input type="text" class="form-control" name="Name" id="Name" />
+                        <p>Seo Url</p><input type="text" class="form-control" name="SeoUrl" id="SeoUrl" />
+                        <p>Image Url</p><input type="text" class="form-control" name="ImageUrl" id="ImageUrl" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-default" data-save="modal">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+@section scripts {
+    <script type="text/javascript">
+        //Kategori silme
+        function DeleteCategory(id, rowNumber) {
+            $.ajax({
+                url: '@Url.Action("DeleteCategory", "Admin")',
+                method: 'DELETE',
+                data: { id },
+                success: function (result) {
+                    if (result == null) {
+                        toastr.error('İşlem gerçekleştirilirken hata oluştu.');
+                    } else if (!result.success) {
+                        toastr.error(result.message);
+                    } else {
+                        toastr.success(result.message);
+                        $('#row-' + rowNumber).remove();
+                    }
+                },
+                error: function (ex) {
+                    toastr.error('İşlem gerçekleştirilirken hata oluştu.');
+                }
+            });
+        }
+    </script>
+}

@@ -23,14 +23,16 @@ namespace OvgBlog.UI.Controllers
         private readonly ICategoryService _categoryService;
         private readonly IArticleService _articleService;
         private readonly ITagService _tagService;
+        private readonly ICommentService _commentService;
        
-        public AdminController(ILogger<AdminController> logger, IUserService userService, ICategoryService categoryService, IArticleService articleService, ITagService tagService)
+        public AdminController(ILogger<AdminController> logger, IUserService userService, ICategoryService categoryService, IArticleService articleService, ITagService tagService, ICommentService commentService)
         {
             _logger = logger;
             _userService = userService;
             _categoryService = categoryService;
             _articleService = articleService;
-            _tagService = tagService;            
+            _tagService = tagService;
+            _commentService = commentService;
         }
 
         [HttpGet]
@@ -203,7 +205,6 @@ namespace OvgBlog.UI.Controllers
                 }
                 article.ArticleTagRelations.Add(tagRelation);               
             }
-
             article.ArticleCategoryRelations.Add(new ArticleCategoryRelation
             {
                 Id = Guid.NewGuid(),
@@ -292,5 +293,53 @@ namespace OvgBlog.UI.Controllers
             return View("Index");
         }
            
+        [HttpGet]
+        public async Task<IActionResult> TagList()
+        {
+            var list = await _tagService.GetAll();
+            var tagList = list.Data.Adapt<List<TagViewModel>>();
+            return View(tagList);
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteTag(TagViewModel tagViewModel)
+        {
+            if (tagViewModel.Id == Guid.Empty)
+            {
+                ModelState.AddModelError(string.Empty, "Id is not valid");
+                return RedirectToAction("ArticleListView");
+            }
+            var result = await _tagService.GetById(tagViewModel.Id);
+            if (result.Data == null)
+            {
+                ModelState.AddModelError(string.Empty, "There is no category with that id.");
+                return RedirectToAction("ArticleListView");
+            }
+            await _tagService.Delete(tagViewModel.Id);
+            return View("Index");
+        }
+        [HttpGet]
+        public async Task<IActionResult> CommentList()
+        {
+            var list = await _commentService.GetAll();
+            var commentList = list.Data.Adapt<List<CommentViewModel>>();
+            return View(commentList);
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteComment(CommentViewModel commentViewModel)
+        {
+            if (commentViewModel.Id == Guid.Empty)
+            {
+                ModelState.AddModelError(string.Empty, "Id is not valid");
+                return RedirectToAction("ArticleListView");
+            }
+            var result = await _commentService.GetById(commentViewModel.Id);
+            if (result.Data == null)
+            {
+                ModelState.AddModelError(string.Empty, "There is no category with that id.");
+                return RedirectToAction("ArticleListView");
+            }
+            await _commentService.Delete(commentViewModel.Id);
+            return View("Index");
+        }
     }
 }

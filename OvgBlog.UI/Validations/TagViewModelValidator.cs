@@ -11,6 +11,7 @@ namespace OvgBlog.UI.Validations
     {
         public TagViewModelValidator()
         {
+            RuleFor(x => x.Id).NotEmpty().NotNull().NotEqual(Guid.Empty);
             RuleFor(x=>x.Name).NotNull().NotEmpty();
             RuleFor(x => x.SeoUrl).NotNull().NotEmpty();
         }

@@ -11,6 +11,7 @@ namespace OvgBlog.UI.Validations
     {
         public CommentViewModelValidator()
         {
+            RuleFor(c => c.Id).NotEmpty().NotEmpty().NotEqual(Guid.Empty);
             RuleFor(c => c.Email).NotNull();
             RuleFor(c => c.Email).NotEmpty();
             RuleFor(c => c.Email).EmailAddress();
