@@ -120,41 +120,6 @@ namespace OvgBlog.UI.Controllers
             var deleteResult = await _categoryService.Delete(id);
             return Json(new JsonResultModel(deleteResult.Success, deleteResult.Message));
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> DeleteCategory(Guid id)
-        //{
-        //    if (id==Guid.Empty)
-        //    {
-        //        ModelState.AddModelError(string.Empty,"Id is not found.");
-        //        return RedirectToAction("CategoryListView");
-        //    }
-        //    var result = await _categoryService.GetById(id);
-        //    if (result.Data == null)
-        //    {
-        //        return RedirectToAction("CategoryListView");
-        //    }
-        //    return View("DeleteCategory");
-        //}
-
-
-        //[HttpPost]
-        //public async Task<IActionResult> DeleteCategory(CategoryListViewModel categoryListViewModel)
-        //{
-        //    if (categoryListViewModel.Id == Guid.Empty)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "Id is not valid");
-        //        return RedirectToAction("CategoryListView");
-        //    }
-        //    var result = await _categoryService.GetById(categoryListViewModel.Id);
-        //    if (result.Data == null)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "There is no category with that id.");
-        //        return RedirectToAction("CategoryListView");
-        //    }
-        //    await _categoryService.Delete(categoryListViewModel.Id);
-        //    return View("Index");
-        //}
         [HttpGet]
         public async Task<IActionResult> AddArticle()
         {
@@ -167,6 +132,7 @@ namespace OvgBlog.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> AddArticle(ArticleAddViewModel model)
         {
+            //Needs to move business
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -227,7 +193,7 @@ namespace OvgBlog.UI.Controllers
 
         [HttpGet]
         public async Task<IActionResult> UpdateArticle(Guid id)
-        {
+        {            
             if (id == Guid.Empty)
             {
                 ModelState.AddModelError(string.Empty, "Id is not valid.");
@@ -239,25 +205,41 @@ namespace OvgBlog.UI.Controllers
                 ModelState.AddModelError(string.Empty, "You dont have this Category.");
                 return RedirectToAction("ArticleListView");
             }
-            var articleResult = result.Data.Adapt<ArticleListViewModel>();
+            var categoryResult = await _categoryService.GetAll();
+            var categoryList = categoryResult.Data.ToList().Adapt<List<CategoryListViewModel>>();
+            var articleResult = result.Data.Adapt<ArticleUpdateViewModel>();
+            var categoryId = result.Data.ArticleCategoryRelations.FirstOrDefault().CategoryId;
+            articleResult.SelectedCategoryId = categoryId;
+            articleResult.CategoryList = categoryList;
             return View(articleResult);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateArticle(ArticleListViewModel articleListViewModel)
+        public async Task<IActionResult> UpdateArticle(ArticleUpdateViewModel articleUpdateViewModel)
         {
-            var result = await _articleService.GetById(articleListViewModel.Id);
+            //Need to move business
+            var result = await _articleService.GetById(articleUpdateViewModel.Id);
             if (result.Data == null)
             {
                 ModelState.AddModelError(string.Empty, "Category is not found.");
                 return RedirectToAction("ArticleListView");
             }
-            result.Data.ImageUrl = articleListViewModel.ImageUrl;
-            result.Data.SeoUrl = articleListViewModel.SeoUrl;
-            result.Data.Body = articleListViewModel.Body;
-            result.Data.Title = articleListViewModel.Title;
+            result.Data.ImageUrl = articleUpdateViewModel.ImageUrl;
+            result.Data.SeoUrl = articleUpdateViewModel.SeoUrl;
+            result.Data.Body = articleUpdateViewModel.Body;
+            result.Data.Title = articleUpdateViewModel.Title;
+            foreach (var item in result.Data.ArticleCategoryRelations)
+            {
+                item.IsDeleted = true;
+                item.DeletedDate = DateTime.Now;
+            }
+            result.Data.ArticleCategoryRelations.Add(new ArticleCategoryRelation
+            {
+                CategoryId = articleUpdateViewModel.SelectedCategoryId,
+                CreatedDate = DateTime.Now
+            });
             await _articleService.Update(result.Data);
-            return View();
+            return RedirectToAction("ArticleList");
         }
 
         [HttpGet]

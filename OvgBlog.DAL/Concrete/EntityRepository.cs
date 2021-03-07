@@ -52,13 +52,24 @@ namespace OvgBlog.DAL.Concrete
             }
         }
 
-        public async Task<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, Expression<Func<TEntity, object>> includeFilter = null)
+        public async Task<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeFilters = null)
         {
             using (TContext context = new TContext())
             {
-                return includeFilter == null
-                    ? await context.Set<TEntity>().SingleOrDefaultAsync(filter)
-                    : await context.Set<TEntity>().Include(includeFilter).SingleOrDefaultAsync(filter);
+                if(includeFilters == null || includeFilters.Count == 0)
+                {
+                    return await context.Set<TEntity>().SingleOrDefaultAsync(filter);
+                }
+                else
+                {
+                    var query = context.Set<TEntity>().AsQueryable();
+                    foreach (var item in includeFilters)
+                    {
+                        query = query.Include(item);
+                    }
+                    return await query.FirstOrDefaultAsync();
+                }  
+                                    
             }
         }
 

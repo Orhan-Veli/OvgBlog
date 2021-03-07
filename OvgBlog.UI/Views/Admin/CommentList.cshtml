@@ -18,7 +18,7 @@
             <div class="col-md-12">
                 <div id="PlaceHolderElement"></div>
                 @*<h4>Category Table <span><a asp-action="AddCategory" class="PositionOfSign" type="button"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>*@
-                <h4>Tag Table <span><a type="button" class="PositionOfSign" data-toggle="ajax-modal" data-target="#myModal"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>
+            <h4>Comment Table <span><a type="button" class="PositionOfSign" data-toggle="ajax-modal" data-target="#myModal"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>
                 <div class="table-responsive">
                     <table id="mytable" class="table table-bordred table-striped">
                         <thead>
@@ -35,7 +35,7 @@
                                         <td>@item.Body</td>
                                         <td>@item.Email</td>
                                         <td>
-                                            <a href="javascript:;" onclick="DeleteCategory('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a>
+                                            <a href="javascript:;" onclick="DeleteComment('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a>
                                         </td>
                                     </tr>
                                     i++;
@@ -73,21 +73,23 @@
     </div>
 </body>
 @section scripts {
-    <script type="text/javascript">
-        //Kategori silme
-        function DeleteCategory(id, rowNumber) {
+    <script type="text/javascript">        
+        function DeleteComment(id, rowNumber) {
             $.ajax({
-                url: '@Url.Action("DeleteCategory", "Admin")',
-                method: 'DELETE',
+                url: '@Url.Action("DeleteComment", "Admin")',
+                method: 'post',
                 data: { id },
                 success: function (result) {
                     if (result == null) {
                         toastr.error('İşlem gerçekleştirilirken hata oluştu.');
+                        location.reload();
                     } else if (!result.success) {
                         toastr.error(result.message);
+                        location.reload();
                     } else {
                         toastr.success(result.message);
                         $('#row-' + rowNumber).remove();
+                        location.reload();
                     }
                 },
                 error: function (ex) {

@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Dashboard</title>
+    <title>OVG ADMIN</title>
 
     <!-- Custom fonts for this template-->
     <link href="~/SBAdmin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -32,34 +32,38 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <div class="sidebar-brand d-flex align-items-center justify-content-center">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">OVG Admin</div>
-            </a>
+                <div class="sidebar-brand-text mx-3"> OVG Admin</div>
+            </div>
 
             <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
+         
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" asp-controller="Admin" asp-action="CategoryList">                    
+                <a class="nav-link" asp-controller="Admin" asp-action="Index">
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" asp-controller="Admin" asp-action="CategoryList">
                     <span>Category</span>
                 </a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" asp-controller="Admin" asp-action="ArticleList">                   
+                <a class="nav-link" asp-controller="Admin" asp-action="ArticleList">
                     <span>Article</span>
                 </a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" asp-controller="Admin" asp-action="TagList">                    
+                <a class="nav-link" asp-controller="Admin" asp-action="TagList">
                     <span>Tag</span>
                 </a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" asp-controller="Admin" asp-action="CommentList">                   
+                <a class="nav-link" asp-controller="Admin" asp-action="CommentList">
                     <span>Comment</span>
                 </a>
             </li>

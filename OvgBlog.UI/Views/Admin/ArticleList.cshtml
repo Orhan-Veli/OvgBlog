@@ -26,7 +26,6 @@
                     <th>Title</th>
                     <th>SeoUrl</th>
                     <th>Image</th>
-                    <th>Body</th>
                     <th>Edit</th>
                     <th>Delete</th>
                     </thead>
@@ -39,7 +38,6 @@
                                 <td>@item.Title</td>
                                 <td>@item.SeoUrl</td>
                                 <td>@item.ImageUrl</td>
-                                <td>@item.Body</td>
                             <form method="post">
                                 <td><a class="button-container" asp-route-Id="@item.Id" asp-action="UpdateArticle" name="@item.Id" type="button"><img src="/uploads/Edit.png" width="20px"></a></td>
                                 <td><a class="button-container" asp-route-Id="@item.Id" asp-action="DeleteArticle" name="@item.Id" type="button"><img src="/uploads/Delete.png" width="20px"></a></td>

@@ -5,6 +5,7 @@ using OvgBlog.DAL.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace OvgBlog.Business.Services
@@ -110,7 +111,10 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Article>(false, Message.IdIsNotValid);
             }
-            var articleEntity = await _articleRepository.Get((x => x.Id == id && !x.IsDeleted), (x => x.Comments));
+            var expressions = new List<Expression<Func<Article, object>>>();
+            expressions.Add(x=> x.Comments);
+            expressions.Add(x => x.ArticleCategoryRelations);
+            var articleEntity = await _articleRepository.Get((x => x.Id == id && !x.IsDeleted), expressions);
             if (articleEntity == null)
             {
                 return new Result<Article>(false, Message.ArticleIsNotFound);
@@ -124,7 +128,10 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Article>(false, Message.FieldIsNotValid);
             }
-            var articleEntity = await _articleRepository.Get((x => x.SeoUrl == seoUrl && !x.IsDeleted), (x => x.Comments));
+            var expressions = new List<Expression<Func<Article, object>>>();
+            expressions.Add(x => x.Comments);
+            expressions.Add(x => x.ArticleCategoryRelations);
+            var articleEntity = await _articleRepository.Get((x => x.SeoUrl == seoUrl && !x.IsDeleted), expressions);
             if (articleEntity == null)
             {
                 return new Result<Article>(false, Message.ArticleIsNotFound);

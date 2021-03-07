@@ -1,23 +1,24 @@
-﻿@model ArticleListViewModel
+﻿@model ArticleUpdateViewModel
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 <div class="col-md-8">
     <div class="card">
         <div class="card-header card-header-primary">
-            <h4 class="card-title">Update Category</h4>
+            <h4 class="card-title">Update Article</h4>
         </div>
         <div class="card-body">
             <form method="post">
                 <input asp-for="Id" hidden />
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="form-group bmd-form-group">
-                            <label class="bmd-label-floating">Category Name</label>
-                            <input type="text" asp-for="Body" class="form-control">
-
+                            <label class="bmd-label-floating">Title</label>
+                            <input type="text" asp-for="Title" class="form-control">
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-group bmd-form-group">
                             <label class="bmd-label-floating">Seo Url</label>
@@ -34,10 +35,26 @@
                     </div>
                 </div>
                 <div class="row">
+                    <label for="Category">Choose a Category:</label>
+                    <select id="SelectedCategoryId" name="SelectedCategoryId">
+                        @foreach (var item in Model.CategoryList)
+                        {
+                            if (item.Id == Model.SelectedCategoryId)
+                            {
+                                <option value="@item.Id" selected="selected">@item.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-group bmd-form-group">
-                            <label class="bmd-label-floating">Title</label>
-                            <input type="text" asp-for="Title" class="form-control">
+                            <label class="bmd-label-floating">Body</label>
+                            <textarea type="text" cols="10" rows="10" asp-for="Body" class="form-control">@Model.Body</textarea>
                         </div>
                     </div>
                 </div>
