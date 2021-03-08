@@ -62,18 +62,21 @@ namespace OvgBlog.UI.Controllers
         {
             if(!ModelState.IsValid)
             {
-                return View(categoryAddViewModel);
+                return Json(new JsonResultModel<Category>(false, "Tüm alanları doldurun."));
             }
             categoryAddViewModel.SeoUrl = categoryAddViewModel.SeoUrl.ReplaceSeoUrl();
             var result = await _categoryService.CategoryBySeoUrl(categoryAddViewModel.SeoUrl);
             if (result.Success)
-            {
-                ModelState.AddModelError("SeoUrl", "SeoUrl is already taken");
-                return View(categoryAddViewModel);
+            {              
+                return Json(new JsonResultModel<Category>(false, "SeoUrl zaten bulunuyor."));
             }
             var category =  categoryAddViewModel.Adapt<Category>();
-            await _categoryService.Create(category);
-            return RedirectToAction("CategoryList");
+            var createResult =  await _categoryService.Create(category);
+            if (!createResult.Success || createResult.Data ==null)
+            {
+                return Json(new JsonResultModel<Category>(false, "Kayıt Eklenemedi"));
+            }
+            return Json(new JsonResultModel<Category>(true, createResult.Data, "Kayıt eklendi"));
         }
 
         [HttpGet]
@@ -115,10 +118,10 @@ namespace OvgBlog.UI.Controllers
         {
             if(id == Guid.Empty)
             {
-                return Json(new JsonResultModel(false, "Geçersiz kategori id"));
+                return Json(new JsonResultModel<Category>(false, "Geçersiz kategori id"));
             }
             var deleteResult = await _categoryService.Delete(id);
-            return Json(new JsonResultModel(deleteResult.Success, deleteResult.Message));
+            return Json(new JsonResultModel<Category>(deleteResult.Success, deleteResult.Message));
         }
         [HttpGet]
         public async Task<IActionResult> AddArticle()
@@ -242,38 +245,38 @@ namespace OvgBlog.UI.Controllers
             return RedirectToAction("ArticleList");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> DeleteArticle(Guid id)
-        {
-            if (id == Guid.Empty)
-            {
-                ModelState.AddModelError(string.Empty, "Id is not found.");
-                return RedirectToAction("ArticleListView");
-            }
-            var result = await _articleService.GetById(id);
-            if (result.Data == null)
-            {
-                return RedirectToAction("ArticleListView");
-            }
-            return View("DeleteArticle");
-        }
-        [HttpPost]
-        public async Task<IActionResult> DeleteArticle(ArticleListViewModel articleListViewModel)
-        {
-            if (articleListViewModel.Id == Guid.Empty)
-            {
-                ModelState.AddModelError(string.Empty, "Id is not valid");
-                return RedirectToAction("ArticleListView");
-            }
-            var result = await _articleService.GetById(articleListViewModel.Id);
-            if (result.Data == null)
-            {
-                ModelState.AddModelError(string.Empty, "There is no category with that id.");
-                return RedirectToAction("ArticleListView");
-            }
-            await _articleService.Delete(articleListViewModel.Id);
-            return View("Index");
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> DeleteArticle(Guid id)
+        //{
+        //    if (id == Guid.Empty)
+        //    {
+        //        ModelState.AddModelError(string.Empty, "Id is not found.");
+        //        return RedirectToAction("ArticleListView");
+        //    }
+        //    var result = await _articleService.GetById(id);
+        //    if (result.Data == null)
+        //    {
+        //        return RedirectToAction("ArticleListView");
+        //    }
+        //    return View("DeleteArticle");
+        //}
+        //[HttpPost]
+        //public async Task<IActionResult> DeleteArticle(ArticleListViewModel articleListViewModel)
+        //{
+        //    if (articleListViewModel.Id == Guid.Empty)
+        //    {
+        //        ModelState.AddModelError(string.Empty, "Id is not valid");
+        //        return RedirectToAction("ArticleListView");
+        //    }
+        //    var result = await _articleService.GetById(articleListViewModel.Id);
+        //    if (result.Data == null)
+        //    {
+        //        ModelState.AddModelError(string.Empty, "There is no category with that id.");
+        //        return RedirectToAction("ArticleListView");
+        //    }
+        //    await _articleService.Delete(articleListViewModel.Id);
+        //    return View("Index");
+        //}
            
         [HttpGet]
         public async Task<IActionResult> TagList()
@@ -282,22 +285,15 @@ namespace OvgBlog.UI.Controllers
             var tagList = list.Data.Adapt<List<TagViewModel>>();
             return View(tagList);
         }
-        [HttpPost]
-        public async Task<IActionResult> DeleteTag(TagViewModel tagViewModel)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteTag(Guid id)
         {
-            if (tagViewModel.Id == Guid.Empty)
+            if (id == Guid.Empty)
             {
-                ModelState.AddModelError(string.Empty, "Id is not valid");
-                return RedirectToAction("ArticleListView");
+                return Json(new JsonResultModel<Tag>(false, "Geçersiz tag id"));
             }
-            var result = await _tagService.GetById(tagViewModel.Id);
-            if (result.Data == null)
-            {
-                ModelState.AddModelError(string.Empty, "There is no category with that id.");
-                return RedirectToAction("ArticleListView");
-            }
-            await _tagService.Delete(tagViewModel.Id);
-            return View("Index");
+            var deleteResult = await _tagService.Delete(id);
+            return Json(new JsonResultModel<Tag>(deleteResult.Success, deleteResult.Message));
         }
         [HttpGet]
         public async Task<IActionResult> CommentList()
@@ -306,22 +302,33 @@ namespace OvgBlog.UI.Controllers
             var commentList = list.Data.Adapt<List<CommentViewModel>>();
             return View(commentList);
         }
-        [HttpPost]
-        public async Task<IActionResult> DeleteComment(CommentViewModel commentViewModel)
+        //[HttpPost]
+        //public async Task<IActionResult> DeleteComment(CommentViewModel commentViewModel)
+        //{
+        //    if (commentViewModel.Id == Guid.Empty)
+        //    {
+        //        ModelState.AddModelError(string.Empty, "Id is not valid");
+        //        return RedirectToAction("ArticleListView");
+        //    }
+        //    var result = await _commentService.GetById(commentViewModel.Id);
+        //    if (result.Data == null)
+        //    {
+        //        ModelState.AddModelError(string.Empty, "There is no category with that id.");
+        //        return RedirectToAction("ArticleListView");
+        //    }
+        //    await _commentService.Delete(commentViewModel.Id);
+        //    return View("Index");
+        //}
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteArticle(Guid id)
         {
-            if (commentViewModel.Id == Guid.Empty)
+            if (id == Guid.Empty)
             {
-                ModelState.AddModelError(string.Empty, "Id is not valid");
-                return RedirectToAction("ArticleListView");
+                return Json(new JsonResultModel<Article>(false, "Geçersiz article id"));
             }
-            var result = await _commentService.GetById(commentViewModel.Id);
-            if (result.Data == null)
-            {
-                ModelState.AddModelError(string.Empty, "There is no category with that id.");
-                return RedirectToAction("ArticleListView");
-            }
-            await _commentService.Delete(commentViewModel.Id);
-            return View("Index");
+            var deleteResult = await _articleService.Delete(id);
+            return Json(new JsonResultModel<Article>(deleteResult.Success, deleteResult.Message));
         }
     }
 }

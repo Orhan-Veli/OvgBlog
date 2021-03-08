@@ -1,14 +1,11 @@
 ﻿@model List<CategoryListViewModel>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    int i = 1;
 }
 
 @section styles {
-    <style type="text/css">
-        .PositionOfSign {
-            margin-right: 10px;
-        }
-    </style>
+
 }
 <body>
     <div class="container">
@@ -16,11 +13,10 @@
 
 
             <div class="col-md-12">
-                <div id="PlaceHolderElement"></div>
                 @*<h4>Category Table <span><a asp-action="AddCategory" class="PositionOfSign" type="button"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>*@
-            <h4>Category Table <span><a type="button" class="PositionOfSign" data-toggle="ajax-modal" data-target="#myModal"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>
+                <h4>Category Table <span><a href="javascript:;" id="myForm" data-toggle="modal" data-target="#myModal" type="button"> <img src="~/uploads/PlusIcon.png" width="20" style="margin-right: 10px;" /></a></span> </h4>
                 <div class="table-responsive">
-                    <table id="mytable" class="table table-bordred table-striped">
+                    <table id="myTable" class="table table-bordred table-striped">
                         <thead>
                         <th>Name</th>
                         <th>SeoUrl</th>
@@ -29,7 +25,6 @@
                         </thead>
                         <tbody>
                             @{
-                                int i = 1;
                                 foreach (var item in Model)
                                 {
                                     <tr id="row-@i">
@@ -37,47 +32,50 @@
                                         <td>@item.SeoUrl</td>
                                         <td>@item.ImageUrl</td>
                                         <td>
-                                            <a href="@Url.Action("UpdateCategory", "Admin", new { item.Id })" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a>
+                                            @*<a href="@Url.Action("UpdateCategory", "Admin", new { item.Id })" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a>*@
+                                            @*<a href="javascript:;" id="myForm" data-toggle="modal" data-target="#myModal" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a>*@
                                             <a href="javascript:;" onclick="DeleteCategory('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a>
-                                        </td>                                       
+                                        </td>
                                     </tr>
                                     i++;
                                 }
                             }
                         </tbody>
-                    </table>                 
+                    </table>
 
                 </div>
 
             </div>
         </div>
     </div>
-        <!-- Modal -->
-        <div class="modal fade" id="myModal" role="dialog">
-            <div class="modal-dialog modal-sm">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" style="margin:10px; margin-right:110px">Category Ekle</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                      <div class="modal-body">
-                        <div class="form-group">
-                            <p>Category Name</p><input type="text" class="form-control" name="Name" id="Name" />
-                            <p>Seo Url</p><input type="text" class="form-control" name="SeoUrl" id="SeoUrl" />
-                            <p>Image Url</p><input type="text" class="form-control" name="ImageUrl" id="ImageUrl" />
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
-                        <button type="button" class="btn btn-default" data-save="modal">Kaydet</button>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" style="margin:10px; margin-right:110px">Category Add</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <p>Category Name</p><input type="text" class="form-control" name="Name" id="Name" />
+                        <p>Seo Url</p><input type="text" class="form-control" name="SeoUrl" id="SeoUrl" />
+                        <p>Image Url</p><input type="text" class="form-control" name="ImageUrl" id="ImageUrl" />
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" id="close" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                    <button type="button" id="saveval" class="btn btn-default" data-save="modal">Kaydet</button>
+                </div>
             </div>
-        </div>        
+        </div>
+    </div>
+
+
 </body>
 @section scripts {
     <script type="text/javascript">
-        //Kategori silme
+        var counter = @i;
         function DeleteCategory(id, rowNumber) {
             $.ajax({
                 url: '@Url.Action("DeleteCategory", "Admin")',
@@ -91,6 +89,11 @@
                     } else {
                         toastr.success(result.message);
                         $('#row-' + rowNumber).remove();
+                        counter--;
+                        if (counter < 0) {
+                            counter = 0;
+
+                        }
                     }
                 },
                 error: function (ex) {
@@ -98,21 +101,35 @@
                 }
             });
         }
+
+
+
+    $("#myForm").on('click', function () {
+        $('#myModal').modal('show');
+
+    });
+        $("#saveval").on('click', function () {
+            var Name = $("#Name").val();
+            var SeoUrl = $("#SeoUrl").val();
+            var ImageUrl = $("#ImageUrl").val();
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("AddCategory","Admin")',
+                data: { Name, SeoUrl, ImageUrl },
+                success: function (result) {
+                    if (result.success) {
+                        $('#myModal').modal('hide');
+                        counter++;
+                        $('#myTable > tbody:last-child').append('<tr><td>' + result.data.name + '</td><td>' + result.data.seoUrl + '</td><td>' + result.data.imageUrl + '</td>'
+                            + '<td> <a href="javascript:;" onclick="DeleteCategory(' + result.data.id + ',' + counter + ')" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a></td></tr>');
+                    }
+                    else {
+                        toastr.error(result.message ?? 'sistemsel hata oluştur');
+                    }
+                }
+            });
+        });
     </script>
-<script>
-    $(function () {
-        var PlaceHolderElement = $('#PlaceHolderHere');
-        PlaceHolderElement.on('click', 'data-save="modal"', function (result) {
-            var form = $(this).parents('.modal').find('form');
-            var actionUrl = form.attr('action');
-            var sendData = form.serialize();
-            $.post(actionUrl, sendData).done(function (data) {
-                PlaceHolderElement.find('.modal').modal('hide');
-                location.reload();
-            })
-        })
-    })
-</script> 
 }
 
 

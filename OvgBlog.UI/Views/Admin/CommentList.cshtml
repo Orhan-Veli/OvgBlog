@@ -4,11 +4,6 @@
 }
 
 @section styles {
-    <style type="text/css">
-        .PositionOfSign {
-            margin-right: 10px;
-        }
-    </style>
 }
 <body>
     <div class="container">
@@ -16,9 +11,7 @@
 
 
             <div class="col-md-12">
-                <div id="PlaceHolderElement"></div>
-                @*<h4>Category Table <span><a asp-action="AddCategory" class="PositionOfSign" type="button"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>*@
-            <h4>Comment Table <span><a type="button" class="PositionOfSign" data-toggle="ajax-modal" data-target="#myModal"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>
+            <h4>Comment Table </h4>
                 <div class="table-responsive">
                     <table id="mytable" class="table table-bordred table-striped">
                         <thead>
@@ -77,7 +70,7 @@
         function DeleteComment(id, rowNumber) {
             $.ajax({
                 url: '@Url.Action("DeleteComment", "Admin")',
-                method: 'post',
+                method: 'DELETE',
                 data: { id },
                 success: function (result) {
                     if (result == null) {

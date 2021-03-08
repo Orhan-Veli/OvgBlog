@@ -48,8 +48,7 @@ namespace OvgBlog.Business.Services
             category.Id = Guid.NewGuid();
             category.CreatedDate = DateTime.Now;
             await _categoryRepository.Create(category);
-            return new Result<Category>(true,category);
-            
+            return new Result<Category>(true,category);            
         }
 
         public async Task<IResult<object>> Delete(Guid id)

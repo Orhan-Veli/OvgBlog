@@ -76,7 +76,7 @@
         function DeleteTag(id, rowNumber) {
             $.ajax({
                 url: '@Url.Action("DeleteTag", "Admin")',
-                method: 'post',
+                method: 'DELETE',
                 data: { id },
                 success: function (result) {
                     if (result == null) {
