@@ -58,7 +58,9 @@ namespace OvgBlog.DAL.Concrete
             {
                 if(includeFilters == null || includeFilters.Count == 0)
                 {
-                    return await context.Set<TEntity>().SingleOrDefaultAsync(filter);
+                    return filter == null
+                        ? await context.Set<TEntity>().SingleOrDefaultAsync()
+                        : await context.Set<TEntity>().SingleOrDefaultAsync(filter);
                 }
                 else
                 {
@@ -67,9 +69,11 @@ namespace OvgBlog.DAL.Concrete
                     {
                         query = query.Include(item);
                     }
-                    return await query.FirstOrDefaultAsync();
+
+                    return filter == null
+                        ? await query.SingleOrDefaultAsync()
+                        : await query.SingleOrDefaultAsync(filter);
                 }  
-                                    
             }
         }
 

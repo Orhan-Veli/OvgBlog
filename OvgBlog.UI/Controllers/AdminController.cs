@@ -160,7 +160,6 @@ namespace OvgBlog.UI.Controllers
                 CategoryId = model.CategoryId,
                 CreatedDate = DateTime.Now
             });
-
             await _articleService.Create(article);
             return RedirectToAction("Index");
         }

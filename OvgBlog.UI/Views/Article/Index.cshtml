@@ -61,17 +61,18 @@
             <!-- contact form -->
             <form action="" class="contact-form col-md-10 col-lg-8 m-auto">
                 <div class="form-row">
+                    <div><input id="@Model.Id" name="@Model.Id" type="hidden"></div>
                     <div class="form-group col-sm-6">
-                        <input type="text" size="50" class="form-control" placeholder="Ad Soyad" required>
+                        <input type="text" size="50" class="form-control" name="Name" id="Name"  placeholder="Ad Soyad" required>
                     </div>
                     <div class="form-group col-sm-6">
-                        <input type="email" class="form-control" placeholder="E-posta" requried>
+                        <input type="email" class="form-control" name="Email" id="Email" placeholder="E-posta" requried>
                     </div>
                     <div class="form-group col-sm-12">
-                        <textarea name="comment" id="comment" rows="6" class="form-control" placeholder="Bir şeyler yaz"></textarea>
+                        <textarea name="Body" id="Body" rows="6" class="form-control" placeholder="Bir şeyler yaz"></textarea>
                     </div>
                     <div class="form-group col-sm-12 mt-3">
-                        <input type="submit" value="Gönder" class="btn btn-outline-primary rounded">
+                        <button type="button" id="sendVal" class="btn btn-outline-primary rounded">Gönder</button>
                     </div>
                 </div>
             </form><!-- end of contact form -->
@@ -79,4 +80,34 @@
     </section>
     <!-- end of contact section -->
 </div>
+@section scripts{ 
+    <script type="text/javascript">
+        $('#contact #sendVal').on('click', function () {
+        
+         var ArticleId = "@Model.Id"; @*$("#@Model.Id").val()*@       
+         var name = $("#Name").val();
+         var email = $("#Email").val();
+         var body = $("#Body").val();
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("AddComment","Comment")',
+                data: { ArticleId, name, email, body },
+            success: function (result) {
+                if (result.success)
+                {
+                    location.reload();
+                }
+                else
+                {
+                    alert('işlem gerçekleştirilemedi.');
+                }
+            }
+        });
+    });
+
+
+    </script>
+}
+
+
 

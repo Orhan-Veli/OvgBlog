@@ -43,7 +43,6 @@ namespace OvgBlog.UI.Controllers
             {
                 model.UserName = userResponse.Data.Name;
             }
-
             return View(model);
         }
     }
