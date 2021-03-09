@@ -38,8 +38,7 @@ namespace OvgBlog.UI.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View();
-            
+            return View();            
         }
 
         [HttpGet]
@@ -79,38 +78,19 @@ namespace OvgBlog.UI.Controllers
             return Json(new JsonResultModel<Category>(true, createResult.Data, "Kayıt eklendi"));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> UpdateCategory(Guid id)
-        {
-            if (id == Guid.Empty)
-            {
-                ModelState.AddModelError(string.Empty,"Id is not valid.");
-                return View("Index");
-            }
-            var result = await _categoryService.GetById(id);
-            if (result.Data == null)
-            {
-                ModelState.AddModelError(string.Empty, "You dont have this Category.");
-                return View("Index");
-            }
-            var categoryResult = result.Data.Adapt<CategoryListViewModel>();
-            return View(categoryResult);
-        }
-
-        [HttpPost]
+        [HttpPut]
         public async Task<IActionResult> UpdateCategory(CategoryListViewModel categoryListViewModel)
         {
             var result = await _categoryService.GetById(categoryListViewModel.Id);
             if (result.Data == null)
-            {
-                ModelState.AddModelError(string.Empty, "Category is not found.");
-                return RedirectToAction("Index");
+            {               
+                return Json(new JsonResultModel<Category>(false, "Category is not found."));
             }
             result.Data.ImageUrl = categoryListViewModel.ImageUrl;
             result.Data.SeoUrl = categoryListViewModel.SeoUrl;
             result.Data.Name = categoryListViewModel.Name;
             await _categoryService.Update(result.Data);
-            return RedirectToAction("CategoryListView");
+            return Json(new JsonResultModel<Category>(true,result.Data, "Güncellendi."));
         }
 
         [HttpDelete]
@@ -185,7 +165,6 @@ namespace OvgBlog.UI.Controllers
             return RedirectToAction("Index");
         }
 
-
         [HttpGet]
         public async Task<IActionResult> ArticleList()
         {
@@ -244,39 +223,6 @@ namespace OvgBlog.UI.Controllers
             await _articleService.Update(result.Data);
             return RedirectToAction("ArticleList");
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> DeleteArticle(Guid id)
-        //{
-        //    if (id == Guid.Empty)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "Id is not found.");
-        //        return RedirectToAction("ArticleListView");
-        //    }
-        //    var result = await _articleService.GetById(id);
-        //    if (result.Data == null)
-        //    {
-        //        return RedirectToAction("ArticleListView");
-        //    }
-        //    return View("DeleteArticle");
-        //}
-        //[HttpPost]
-        //public async Task<IActionResult> DeleteArticle(ArticleListViewModel articleListViewModel)
-        //{
-        //    if (articleListViewModel.Id == Guid.Empty)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "Id is not valid");
-        //        return RedirectToAction("ArticleListView");
-        //    }
-        //    var result = await _articleService.GetById(articleListViewModel.Id);
-        //    if (result.Data == null)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "There is no category with that id.");
-        //        return RedirectToAction("ArticleListView");
-        //    }
-        //    await _articleService.Delete(articleListViewModel.Id);
-        //    return View("Index");
-        //}
            
         [HttpGet]
         public async Task<IActionResult> TagList()
@@ -302,23 +248,17 @@ namespace OvgBlog.UI.Controllers
             var commentList = list.Data.Adapt<List<CommentViewModel>>();
             return View(commentList);
         }
-        //[HttpPost]
-        //public async Task<IActionResult> DeleteComment(CommentViewModel commentViewModel)
-        //{
-        //    if (commentViewModel.Id == Guid.Empty)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "Id is not valid");
-        //        return RedirectToAction("ArticleListView");
-        //    }
-        //    var result = await _commentService.GetById(commentViewModel.Id);
-        //    if (result.Data == null)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "There is no category with that id.");
-        //        return RedirectToAction("ArticleListView");
-        //    }
-        //    await _commentService.Delete(commentViewModel.Id);
-        //    return View("Index");
-        //}
+     
+        [HttpDelete]
+        public async Task<IActionResult> DeleteComment(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return Json(new JsonResultModel<Comment>(false, "Geçersiz article id"));
+            }
+            var deleteResult = await _commentService.Delete(id);
+            return Json(new JsonResultModel<Comment>(deleteResult.Success, deleteResult.Message));
+        }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteArticle(Guid id)

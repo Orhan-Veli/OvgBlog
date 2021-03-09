@@ -34,6 +34,7 @@
                                         <td>
                                             @*<a href="@Url.Action("UpdateCategory", "Admin", new { item.Id })" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a>*@
                                             @*<a href="javascript:;" id="myForm" data-toggle="modal" data-target="#myModal" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a>*@
+                                            <a href="javascript:;" onclick="UpdateCategory('@item.Id','@item.Name','@item.SeoUrl','@item.ImageUrl')" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a>
                                             <a href="javascript:;" onclick="DeleteCategory('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a>
                                         </td>
                                     </tr>
@@ -58,6 +59,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
+                        <input type="hidden" id="id" name="id" />
                         <p>Category Name</p><input type="text" class="form-control" name="Name" id="Name" />
                         <p>Seo Url</p><input type="text" class="form-control" name="SeoUrl" id="SeoUrl" />
                         <p>Image Url</p><input type="text" class="form-control" name="ImageUrl" id="ImageUrl" />
@@ -92,7 +94,6 @@
                         counter--;
                         if (counter < 0) {
                             counter = 0;
-
                         }
                     }
                 },
@@ -101,34 +102,65 @@
                 }
             });
         }
-
-
-
-    $("#myForm").on('click', function () {
-        $('#myModal').modal('show');
-
+        $("#myForm").on('click', function () {
+            OpenModal();
     });
+        function OpenModal() {
+            $('#myModal #id').val("");
+            $('#myModal #Name').val("");
+            $('#myModal #SeoUrl').val("");
+            $('#myModal #ImageUrl').val("");
+            $('#myModal').modal('show');
+        }
         $("#saveval").on('click', function () {
+            var Id = $("#id").val();
             var Name = $("#Name").val();
             var SeoUrl = $("#SeoUrl").val();
             var ImageUrl = $("#ImageUrl").val();
-            $.ajax({
-                type: 'post',
-                url: '@Url.Action("AddCategory","Admin")',
-                data: { Name, SeoUrl, ImageUrl },
-                success: function (result) {
-                    if (result.success) {
-                        $('#myModal').modal('hide');
-                        counter++;
-                        $('#myTable > tbody:last-child').append('<tr><td>' + result.data.name + '</td><td>' + result.data.seoUrl + '</td><td>' + result.data.imageUrl + '</td>'
-                            + '<td> <a href="javascript:;" onclick="DeleteCategory(' + result.data.id + ',' + counter + ')" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a></td></tr>');
+            if (Id == "") {
+                //Insert
+                $.ajax({
+                    type: 'post',
+                    url: '@Url.Action("AddCategory","Admin")',
+                    data: { Name, SeoUrl, ImageUrl },
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+                            counter++;
+                            $('#myTable > tbody:last-child').append('<tr><td>' + result.data.name + '</td><td>' + result.data.seoUrl + '</td><td>' + result.data.imageUrl + '</td>'
+                                + '<td> <a href="javascript:;" onclick="DeleteCategory(' + result.data.id + ',' + counter + ')" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a></td></tr>');
+                        }
+                        else {
+                            toastr.error(result.message ?? 'sistemsel hata oluştur');
+                        }
                     }
-                    else {
-                        toastr.error(result.message ?? 'sistemsel hata oluştur');
+                });
+            }
+            else
+            {
+                //Update
+                $.ajax({
+                    type: 'put',
+                    url: '@Url.Action("UpdateCategory","Admin")',
+                    data: {Id, Name, SeoUrl, ImageUrl },
+                    success: function (result) {
+                        if (result.success) {
+                            location.reload();
+                        }
+                        else {
+                            toastr.error(result.message ?? 'sistemsel hata oluştur');
+                        }
                     }
-                }
-            });
+                });
+            }
         });
+        function UpdateCategory(id, name, seoUrl, imageUrl) {
+            OpenModal();
+            $('#myModal #id').val(id);
+            $('#myModal #Name').val(name);
+            $('#myModal #SeoUrl').val(seoUrl);
+            $('#myModal #ImageUrl').val(imageUrl);
+        }
     </script>
 }
 
