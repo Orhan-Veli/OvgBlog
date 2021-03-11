@@ -1,7 +1,7 @@
 ﻿using OvgBlog.Business.Abstract;
 using OvgBlog.Business.Constants;
 using OvgBlog.DAL.Abstract;
-using OvgBlog.DAL.Data.Entities;
+using OvgBlog.DAL.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -30,14 +30,14 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<object>> Delete(Guid id)
         {
-            if (id== Guid.Empty)
+            if (id == Guid.Empty)
             {
-                return new Result<object>(false,Message.IdIsNotValid);
+                return new Result<object>(false, Message.IdIsNotValid);
             }
-            var tagEntity =await _tagRepository.Get(x => x.Id == id && !x.IsDeleted);
-            if (tagEntity==null)
+            var tagEntity = await _tagRepository.Get(x => x.Id == id && !x.IsDeleted);
+            if (tagEntity == null)
             {
-                return new Result<Object>(false,Message.TagNotFound);
+                return new Result<Object>(false, Message.TagNotFound);
             }
             tagEntity.IsDeleted = true;
             tagEntity.DeletedDate = DateTime.Now;
@@ -49,25 +49,25 @@ namespace OvgBlog.Business.Services
         {
             if (string.IsNullOrEmpty(name))
             {
-                return new Result<Tag>(false,Message.NameNotFound);
+                return new Result<Tag>(false, Message.NameNotFound);
             }
             var result = await _tagRepository.Get(x => x.Name == name && !x.IsDeleted);
             if (result == null)
             {
                 return new Result<Tag>(false, Message.TagNotFound);
             }
-            return new Result<Tag>(true,result);
+            return new Result<Tag>(true, result);
         }
 
         public async Task<IResult<IEnumerable<Tag>>> GetAll()
         {
-            var list =await _tagRepository.GetAll(x => !x.IsDeleted);
+            var list = await _tagRepository.GetAll(x => !x.IsDeleted);
             return new Result<IEnumerable<Tag>>(true, list);
         }
 
         public async Task<IResult<Tag>> GetById(Guid id)
         {
-            if(id==Guid.Empty)
+            if (id == Guid.Empty)
             {
                 return new Result<Tag>(false, Message.IdIsNotValid);
             }
@@ -76,7 +76,7 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Tag>(false, Message.TagNotFound);
             }
-            return new Result<Tag>(true,tagEntity);
+            return new Result<Tag>(true, tagEntity);
         }
 
         public async Task<IResult<Tag>> Update(Tag tag)
@@ -86,13 +86,13 @@ namespace OvgBlog.Business.Services
                 return new Result<Tag>(false, Message.ModelNotValid);
             }
             var tagEntity = await _tagRepository.Get(x => x.Id == tag.Id && !x.IsDeleted);
-            if (tagEntity==null)
+            if (tagEntity == null)
             {
-                return new Result<Tag>(false,Message.TagNotFound);
+                return new Result<Tag>(false, Message.TagNotFound);
             }
             tag.UpdatedDate = DateTime.Now;
             tagEntity = await _tagRepository.Update(tag);
-            return new Result<Tag>(true,tagEntity);
+            return new Result<Tag>(true, tagEntity);
         }
     }
 }

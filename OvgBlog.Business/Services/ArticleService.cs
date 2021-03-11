@@ -1,11 +1,12 @@
 ﻿using OvgBlog.Business.Abstract;
 using OvgBlog.Business.Constants;
 using OvgBlog.DAL.Abstract;
-using OvgBlog.DAL.Data.Entities;
+using OvgBlog.DAL.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace OvgBlog.Business.Services
@@ -26,34 +27,54 @@ namespace OvgBlog.Business.Services
         }
         public async Task<IResult<Article>> Create(Article article)
         {
-            if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl) || article.Id == Guid.Empty)
+            if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl))
             {
                 return new Result<Article>(false, Message.ModelNotValid);
             }
-
             article.UserId = Guid.Parse("B992346C-E0CC-4EBA-A16B-2B915BB73A51");
             var userEntity = await _userRepository.Get(x => x.Id == article.UserId && !x.IsDeleted);
             if (userEntity == null)
             {
                 return new Result<Article>(false, Message.UserNotFound);
             }
-
             article.Id = Guid.NewGuid();
             article.CreatedDate = DateTime.Now;
-            await _articleRepository.Create(article);
-
-            try
+            await _articleRepository.Create(article); 
+            
+            foreach (var item in article.ArticleTagRelations)
             {
-                await _categoryRelationRepository.Create(new ArticleCategoryRelation { Id = Guid.NewGuid(), ArticleId = article.Id, CategoryId = article.ArticleCategoryRelations.FirstOrDefault().CategoryId, CreatedDate = DateTime.Now });
-                foreach (var item in article.ArticleTagRelations)
+                var tagmodel = new ArticleTagRelation
                 {
-                    await _tagRelationRepository.Create(new ArticleTagRelation { Id = Guid.NewGuid(), TagId = item.TagId, ArticleId = article.Id, CreatedDate = DateTime.Now });
-                }
+                    Id = Guid.NewGuid(),
+                    TagId = item.TagId,
+                    ArticleId = article.Id,                       
+                    CreatedDate = DateTime.Now
+                };
+
+                await _tagRelationRepository.Create(tagmodel);
             }
-            catch (Exception ex)
-            {
-                await _articleRepository.Delete(article.Id);
-            }
+            await _categoryRelationRepository.Create(new ArticleCategoryRelation { Id = Guid.NewGuid(), ArticleId = article.Id, CategoryId = article.ArticleCategoryRelations.FirstOrDefault().CategoryId, CreatedDate = DateTime.Now });
+
+            //try
+            //{
+            //    await _categoryRelationRepository.Create(new ArticleCategoryRelation { Id = Guid.NewGuid(), ArticleId = article.Id, CategoryId = article.ArticleCategoryRelations.FirstOrDefault().CategoryId, CreatedDate = DateTime.Now });
+            //    foreach (var item in article.ArticleTagRelations)
+            //    {
+            //        var tagModel = new ArticleTagRelation
+            //        {
+            //            Id = Guid.NewGuid(),
+            //            TagId = item.Tag.Id,
+            //            ArticleId = article.Id,                       
+            //            CreatedDate = DateTime.Now
+            //        };
+
+            //        await _tagRelationRepository.Create(tagModel);
+            //    }
+            //}
+            //catch (Exception)
+            //{
+            //    await _articleRepository.Delete(article.Id);
+            //}
 
             return new Result<Article>(true, article);
         }
@@ -112,7 +133,7 @@ namespace OvgBlog.Business.Services
                 return new Result<Article>(false, Message.IdIsNotValid);
             }
             var expressions = new List<Expression<Func<Article, object>>>();
-            expressions.Add(x=> x.Comments);
+            expressions.Add(x => x.Comments);
             expressions.Add(x => x.ArticleCategoryRelations);
             var articleEntity = await _articleRepository.Get((x => x.Id == id && !x.IsDeleted), expressions);
             if (articleEntity == null)

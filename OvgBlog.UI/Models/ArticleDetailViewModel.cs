@@ -9,6 +9,7 @@ namespace OvgBlog.UI.Models
         public ArticleDetailViewModel()
         {
             Comments = new List<CommentViewModel>();
+            Tags = new List<TagViewModel>();
         }
         public Guid Id { get; set; }
         public string Title { get; set; }
@@ -18,5 +19,7 @@ namespace OvgBlog.UI.Models
         public string UserName { get; set; }
         public DateTime CreatedDate { get; set; }
         public List<CommentViewModel> Comments { get; set; }
+
+        public List<TagViewModel> Tags { get; set; }
     }
 }

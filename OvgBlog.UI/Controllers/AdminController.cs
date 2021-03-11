@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OvgBlog.Business.Abstract;
-using OvgBlog.DAL.Data.Entities;
+using OvgBlog.DAL.Data;
 using OvgBlog.UI.Extentions;
 using OvgBlog.UI.Models;
 using System;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace OvgBlog.UI.Controllers
 {
-   [Authorize]
+    [Authorize]
     public class AdminController : Controller
     {
         //TODO(proje sonunda yapılacak): Parola encripyt  1234 --> as54dfgfdgd65dfgd778_'r34dfgfd 
@@ -24,7 +24,7 @@ namespace OvgBlog.UI.Controllers
         private readonly IArticleService _articleService;
         private readonly ITagService _tagService;
         private readonly ICommentService _commentService;
-       
+
         public AdminController(ILogger<AdminController> logger, IUserService userService, ICategoryService categoryService, IArticleService articleService, ITagService tagService, ICommentService commentService)
         {
             _logger = logger;
@@ -38,7 +38,7 @@ namespace OvgBlog.UI.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View();            
+            return View();
         }
 
         [HttpGet]
@@ -52,26 +52,26 @@ namespace OvgBlog.UI.Controllers
         [HttpGet]
         public IActionResult AddCategory()
         {
-           var key = User.Claims.FirstOrDefault(x=> x.Type== ClaimTypes.Name).Value;
+            var key = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name).Value;
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> AddCategory(CategoryAddViewModel categoryAddViewModel)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return Json(new JsonResultModel<Category>(false, "Tüm alanları doldurun."));
             }
             categoryAddViewModel.SeoUrl = categoryAddViewModel.SeoUrl.ReplaceSeoUrl();
             var result = await _categoryService.CategoryBySeoUrl(categoryAddViewModel.SeoUrl);
             if (result.Success)
-            {              
+            {
                 return Json(new JsonResultModel<Category>(false, "SeoUrl zaten bulunuyor."));
             }
-            var category =  categoryAddViewModel.Adapt<Category>();
-            var createResult =  await _categoryService.Create(category);
-            if (!createResult.Success || createResult.Data ==null)
+            var category = categoryAddViewModel.Adapt<Category>();
+            var createResult = await _categoryService.Create(category);
+            if (!createResult.Success || createResult.Data == null)
             {
                 return Json(new JsonResultModel<Category>(false, "Kayıt Eklenemedi"));
             }
@@ -83,20 +83,20 @@ namespace OvgBlog.UI.Controllers
         {
             var result = await _categoryService.GetById(categoryListViewModel.Id);
             if (result.Data == null)
-            {               
+            {
                 return Json(new JsonResultModel<Category>(false, "Category is not found."));
             }
             result.Data.ImageUrl = categoryListViewModel.ImageUrl;
             result.Data.SeoUrl = categoryListViewModel.SeoUrl;
             result.Data.Name = categoryListViewModel.Name;
             await _categoryService.Update(result.Data);
-            return Json(new JsonResultModel<Category>(true,result.Data, "Güncellendi."));
+            return Json(new JsonResultModel<Category>(true, result.Data, "Güncellendi."));
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteCategory(Guid id)
         {
-            if(id == Guid.Empty)
+            if (id == Guid.Empty)
             {
                 return Json(new JsonResultModel<Category>(false, "Geçersiz kategori id"));
             }
@@ -114,6 +114,7 @@ namespace OvgBlog.UI.Controllers
 
         [HttpPost]
         public async Task<IActionResult> AddArticle(ArticleAddViewModel model)
+
         {
             //Needs to move business
             if (!ModelState.IsValid)
@@ -121,7 +122,7 @@ namespace OvgBlog.UI.Controllers
                 return View(model);
             }
 
-            model.SeoUrl = model.SeoUrl.ReplaceSeoUrl();           
+            model.SeoUrl = model.SeoUrl.ReplaceSeoUrl();
             var result = await _articleService.GetBySeoUrl(model.SeoUrl);
             if (result.Success && result.Data != null)
             {
@@ -140,19 +141,26 @@ namespace OvgBlog.UI.Controllers
                 };
 
                 var getTag = await _tagService.FindIdByName(tags[i]);
-                if(getTag != null)
+                
+                if (getTag.Data != null)
                 {
                     tagRelation.TagId = getTag.Data.Id;
                 }
                 else
                 {
+                    var tagModel = new Tag { Name = tags[i],SeoUrl=tags[i].ReplaceSeoUrl(), CreatedDate = DateTime.Now, Id = Guid.NewGuid() };
+                    await _tagService.Create(tagModel);
                     tagRelation.Tag = new Tag
                     {
-                        Id = Guid.NewGuid(),
-                        CreatedDate = DateTime.Now
+                        Id = tagModel.Id,
+                        CreatedDate = DateTime.Now,
+                        Name=tagModel.Name,
+                        SeoUrl=tagModel.SeoUrl
                     };
-                }
-                article.ArticleTagRelations.Add(tagRelation);               
+                    tagRelation.TagId = tagModel.Id;
+                }                
+                
+                article.ArticleTagRelations.Add(tagRelation);
             }
             article.ArticleCategoryRelations.Add(new ArticleCategoryRelation
             {
@@ -167,14 +175,14 @@ namespace OvgBlog.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> ArticleList()
         {
-          var list = await _articleService.GetAll();
-          var articleList = list.Data.Adapt<List<ArticleListViewModel>>();
-          return View(articleList);
+            var list = await _articleService.GetAll();
+            var articleList = list.Data.Adapt<List<ArticleListViewModel>>();
+            return View(articleList);
         }
 
         [HttpGet]
         public async Task<IActionResult> UpdateArticle(Guid id)
-        {            
+        {
             if (id == Guid.Empty)
             {
                 ModelState.AddModelError(string.Empty, "Id is not valid.");
@@ -222,7 +230,7 @@ namespace OvgBlog.UI.Controllers
             await _articleService.Update(result.Data);
             return RedirectToAction("ArticleList");
         }
-           
+
         [HttpGet]
         public async Task<IActionResult> TagList()
         {
@@ -247,7 +255,7 @@ namespace OvgBlog.UI.Controllers
             var commentList = list.Data.Adapt<List<CommentViewModel>>();
             return View(commentList);
         }
-     
+
         [HttpDelete]
         public async Task<IActionResult> DeleteComment(Guid id)
         {

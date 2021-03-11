@@ -1,7 +1,7 @@
 ﻿using OvgBlog.Business.Abstract;
 using OvgBlog.Business.Constants;
 using OvgBlog.DAL.Abstract;
-using OvgBlog.DAL.Data.Entities;
+using OvgBlog.DAL.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,27 +18,27 @@ namespace OvgBlog.Business.Services
         }
         public async Task<IResult<User>> Create(User user)
         {
-            if (user==null || string.IsNullOrEmpty(user.Name) || string.IsNullOrEmpty(user.Password))
+            if (user == null || string.IsNullOrEmpty(user.Name) || string.IsNullOrEmpty(user.Password))
             {
-                return new Result<User>(false,Message.ModelNotValid);
+                return new Result<User>(false, Message.ModelNotValid);
             }
             user.Id = Guid.NewGuid();
             user.CreatedDate = DateTime.Now;
             await _userRepository.Create(user);
-            return new Result<User>(true,user);
+            return new Result<User>(true, user);
 
         }
 
         public async Task<IResult<object>> Delete(Guid id)
         {
-            if (id== Guid.Empty)
+            if (id == Guid.Empty)
             {
                 return new Result<object>(false, Message.IdIsNotValid);
             }
             var userEntity = await _userRepository.Get(x => x.Id == id && !x.IsDeleted);
-            if (userEntity==null)
+            if (userEntity == null)
             {
-                return new Result<object>(false,Message.UserNotFound);
+                return new Result<object>(false, Message.UserNotFound);
             }
             userEntity.IsDeleted = true;
             userEntity.DeletedDate = DateTime.Now;
@@ -46,18 +46,18 @@ namespace OvgBlog.Business.Services
             return new Result<object>(true);
         }
 
-        public async Task<IResult<bool>> CheckUser(string  userName,string password)
+        public async Task<IResult<bool>> CheckUser(string userName, string password)
         {
             if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
-                return new Result<bool>(false,Message.UserNotFound);
+                return new Result<bool>(false, Message.UserNotFound);
             }
-            var user = await _userRepository.Get(x=> x.Name == userName || x.Email== userName);
-            if(user == null || user.Name == null || user.Password== null)
+            var user = await _userRepository.Get(x => x.Name == userName || x.Email == userName);
+            if (user == null || user.Name == null || user.Password == null)
             {
                 return new Result<bool>(false, Message.UserNotFound);
             }
-            if(user.Password != password)
+            if (user.Password != password)
             {
                 return new Result<bool>(false, Message.PasswordIsWrong);
             }
@@ -66,16 +66,16 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<User>> GetById(Guid id)
         {
-            if (id==Guid.Empty)
+            if (id == Guid.Empty)
             {
-                return new Result<User>(false,Message.IdIsNotValid);
+                return new Result<User>(false, Message.IdIsNotValid);
             }
             var userEntity = await _userRepository.Get(x => x.Id == id && !x.IsDeleted);
-            if(userEntity==null)
+            if (userEntity == null)
             {
-                return new Result<User>(false,Message.UserNotFound);
+                return new Result<User>(false, Message.UserNotFound);
             }
-            return new Result<User>(true,userEntity);
+            return new Result<User>(true, userEntity);
         }
 
         public async Task<IResult<User>> Update(User user)
@@ -84,10 +84,10 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<User>(false, Message.ModelNotValid);
             }
-            var userEntity = await _userRepository.Get(x=>x.Id==user.Id && !x.IsDeleted);
-            if (userEntity==null)
+            var userEntity = await _userRepository.Get(x => x.Id == user.Id && !x.IsDeleted);
+            if (userEntity == null)
             {
-                return new Result<User>(false,Message.UserNotFound);
+                return new Result<User>(false, Message.UserNotFound);
             }
             user.UpdatedDate = DateTime.Now;
             userEntity = await _userRepository.Update(user);

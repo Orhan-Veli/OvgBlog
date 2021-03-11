@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using OvgBlog.Business.Abstract;
 using OvgBlog.UI.Models;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace OvgBlog.UI.Controllers
 {
@@ -11,14 +12,15 @@ namespace OvgBlog.UI.Controllers
     {
         private readonly IArticleService _articleService;
         private readonly IUserService _userService;
-
+        private readonly ITagService _tagService;
         private readonly ILogger<ArticleController> _logger;
 
-        public ArticleController(ILogger<ArticleController> logger, IArticleService articleService, IUserService userService)
+        public ArticleController(ILogger<ArticleController> logger, IArticleService articleService, IUserService userService, ITagService tagService)
         {
             _logger = logger;
             _articleService = articleService;
             _userService = userService;
+            _tagService = tagService;
         }
 
         // ovgblog.com/article/yazinin-basligi
@@ -36,14 +38,34 @@ namespace OvgBlog.UI.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            var model = response.Data.Adapt<ArticleDetailViewModel>();
-
-            var userResponse = await _userService.GetById(response.Data.UserId);
-            if (userResponse.Success)
+            var articleTags = await _tagService.GetAll();
+            if (articleTags.Data == null || !articleTags.Success || response.Data.ArticleTagRelations.Count == 0)
             {
-                model.UserName = userResponse.Data.Name;
+                var model = response.Data.Adapt<ArticleDetailViewModel>();
+                var userResponse = await _userService.GetById(response.Data.UserId);
+                if (userResponse.Success)
+                {
+                    model.UserName = userResponse.Data.Name;
+                }
+                return View(model);
             }
-            return View(model);
+            else
+            {
+                var model = response.Data.Adapt<ArticleDetailViewModel>();
+                var model1 = articleTags.Data.Where(x => x.Id == response.Data.ArticleTagRelations.FirstOrDefault().TagId);
+
+                foreach (var item in model1)
+                {
+                    model.Tags.Add(item.Adapt<TagViewModel>());
+                }
+                var userResponse = await _userService.GetById(response.Data.UserId);
+                if (userResponse.Success)
+                {
+                    model.UserName = userResponse.Data.Name;
+                }
+                return View(model);
+            }
+
         }
     }
 }

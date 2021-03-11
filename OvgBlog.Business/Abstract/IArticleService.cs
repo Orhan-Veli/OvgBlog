@@ -1,5 +1,5 @@
 ﻿using OvgBlog.Business.Constants;
-using OvgBlog.DAL.Data.Entities;
+using OvgBlog.DAL.Data;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

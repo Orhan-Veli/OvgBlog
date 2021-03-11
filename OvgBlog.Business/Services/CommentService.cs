@@ -1,7 +1,7 @@
 ﻿using OvgBlog.Business.Abstract;
 using OvgBlog.Business.Constants;
 using OvgBlog.DAL.Abstract;
-using OvgBlog.DAL.Data.Entities;
+using OvgBlog.DAL.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,14 +20,14 @@ namespace OvgBlog.Business.Services
         }
         public async Task<IResult<Comment>> Create(Comment comment)
         {
-            if(comment == null || string.IsNullOrEmpty(comment.Name) || string.IsNullOrEmpty(comment.Body) || comment.ArticleId==Guid.Empty)
+            if (comment == null || string.IsNullOrEmpty(comment.Name) || string.IsNullOrEmpty(comment.Body) || comment.ArticleId == Guid.Empty)
             {
-                return new Result<Comment>(false,Message.ModelNotValid);
+                return new Result<Comment>(false, Message.ModelNotValid);
             }
             var articleEntity = _articleRepository.Get(x => x.Id == comment.ArticleId && !x.IsDeleted);
-            if (articleEntity==null)
+            if (articleEntity == null)
             {
-                return new Result<Comment>(false,Message.CommentNotFound);
+                return new Result<Comment>(false, Message.CommentNotFound);
             }
             comment.Id = Guid.NewGuid();
             comment.CreatedDate = DateTime.Now;
@@ -37,14 +37,14 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<object>> Delete(Guid id)
         {
-            if (id==Guid.Empty)
+            if (id == Guid.Empty)
             {
-                return new Result<object>(false,Message.IdIsNotValid);
+                return new Result<object>(false, Message.IdIsNotValid);
             }
             var commentEntity = await _commentRepository.Get(x => x.Id == id && !x.IsDeleted);
-            if (commentEntity==null)
+            if (commentEntity == null)
             {
-                return new Result<object>(false,Message.CommentNotFound);
+                return new Result<object>(false, Message.CommentNotFound);
             }
             var articleEntity = _articleRepository.Get(x => x.Id == id && !x.IsDeleted);
             if (articleEntity == null)
@@ -59,21 +59,21 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<IEnumerable<Comment>>> GetAll()
         {
-          var list = await _commentRepository.GetAll(x => !x.IsDeleted);
-            return new Result<IEnumerable<Comment>>(true,list);
+            var list = await _commentRepository.GetAll(x => !x.IsDeleted);
+            return new Result<IEnumerable<Comment>>(true, list);
         }
 
         public async Task<IResult<Comment>> GetById(Guid id)
         {
-            if(id == Guid.Empty)
+            if (id == Guid.Empty)
             {
                 return new Result<Comment>(false, Message.IdIsNotValid);
             }
-            var commentEntity =await _commentRepository.Get(x => x.Id == id && !x.IsDeleted);
-            if (commentEntity==null)
+            var commentEntity = await _commentRepository.Get(x => x.Id == id && !x.IsDeleted);
+            if (commentEntity == null)
             {
                 return new Result<Comment>(false, Message.CommentNotFound);
-            }           
+            }
             return new Result<Comment>(true, commentEntity);
         }
 
@@ -83,18 +83,18 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Comment>(false, Message.ModelNotValid);
             }
-            var commentEntity =await _commentRepository.Get(x => x.Id == comment.Id && !x.IsDeleted);
-            if (commentEntity==null)
+            var commentEntity = await _commentRepository.Get(x => x.Id == comment.Id && !x.IsDeleted);
+            if (commentEntity == null)
             {
                 return new Result<Comment>(false, Message.CommentNotFound);
             }
-            var articleEntity =await _articleRepository.Get(x => x.Id == comment.ArticleId && !x.IsDeleted);
+            var articleEntity = await _articleRepository.Get(x => x.Id == comment.ArticleId && !x.IsDeleted);
             if (articleEntity == null)
             {
                 return new Result<Comment>(false, Message.CommentNotFound);
             }
             comment.UpdatedDate = DateTime.Now;
-            commentEntity =await _commentRepository.Update(comment);
+            commentEntity = await _commentRepository.Update(comment);
             return new Result<Comment>(true, commentEntity);
 
         }

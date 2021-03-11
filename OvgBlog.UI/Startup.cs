@@ -12,7 +12,7 @@ using OvgBlog.Business.Services;
 using OvgBlog.DAL.Abstract;
 using OvgBlog.DAL.Concrete;
 using OvgBlog.DAL.Data;
-using OvgBlog.DAL.Data.Entities;
+using OvgBlog.DAL;
 using OvgBlog.UI.Models;
 using OvgBlog.UI.Validations;
 using System;
@@ -52,7 +52,7 @@ namespace OvgBlog.UI
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddMvc().AddFluentValidation();
 
-           
+
             services.AddTransient<IValidator<ArticleDetailViewModel>, ArticleDetailViewModelValidator>();
             services.AddTransient<IValidator<ArticleListViewModel>, ArticleListViewModelValidator>();
             services.AddTransient<IValidator<CategoryListViewModel>, CategoryListViewModelValidator>();
@@ -78,7 +78,7 @@ namespace OvgBlog.UI
             });
 
             services.AddRazorPages();
-            
+
         }
 
 
@@ -92,13 +92,13 @@ namespace OvgBlog.UI
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-           
+
             app.UseRouting();
 
             app.UseAuthentication();

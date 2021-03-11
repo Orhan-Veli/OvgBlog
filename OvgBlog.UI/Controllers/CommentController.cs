@@ -1,7 +1,7 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using OvgBlog.Business.Abstract;
-using OvgBlog.DAL.Data.Entities;
+using OvgBlog.DAL.Data;
 using OvgBlog.UI.Models;
 using System;
 using System.Collections.Generic;
@@ -18,12 +18,12 @@ namespace OvgBlog.UI.Controllers
             _commentService = commentService;
         }
 
-       [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> AddComment(CommentAddViewModel commentAddViewModel)
-         {
+        {
             if (!ModelState.IsValid)
             {
-                return  Json(new JsonResultModel<CommentAddViewModel>(false, "Model is not valid."));
+                return Json(new JsonResultModel<CommentAddViewModel>(false, "Model is not valid."));
             }
             var model = commentAddViewModel.Adapt<Comment>();
             var result = await _commentService.Create(model);

@@ -25,12 +25,12 @@ namespace OvgBlog.UI.Pages
         [BindProperty, DataType(DataType.Password)]
         public string Password { get; set; }
         public string Message { get; set; }
-      
-        public async Task<IActionResult> OnPost(string returnUrl=null)
+
+        public async Task<IActionResult> OnPost(string returnUrl = null)
         {
             if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
             {
-                Message= "Tüm alanlarý eksiksiz doldurun!";
+                Message = "Tüm alanlarý eksiksiz doldurun!";
                 return Page();
             }
             var result = await _userService.CheckUser(UserName, Password);
@@ -42,10 +42,10 @@ namespace OvgBlog.UI.Pages
             var claims = new List<Claim> {
             new Claim(ClaimTypes.Name, UserName),
             new Claim(ClaimTypes.Role, "Admin")            
-            };
+           };
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties() { IsPersistent = true });
             return Redirect("/Admin");
-        }
+       }
     }
 }

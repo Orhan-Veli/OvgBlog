@@ -1,7 +1,7 @@
 ﻿using OvgBlog.Business.Abstract;
 using OvgBlog.Business.Constants;
 using OvgBlog.DAL.Abstract;
-using OvgBlog.DAL.Data.Entities;
+using OvgBlog.DAL.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,12 +23,12 @@ namespace OvgBlog.Business.Services
         {
             if (string.IsNullOrEmpty(seoUrl))
             {
-                return new Result<Category>(false,Message.CategoryNotFound);
+                return new Result<Category>(false, Message.CategoryNotFound);
             }
-            var category = await _categoryRepository.Get(x=>x.SeoUrl==seoUrl);
-            if (category==null)
+            var category = await _categoryRepository.Get(x => x.SeoUrl == seoUrl);
+            if (category == null)
             {
-                return new Result<Category>(false,Message.CategoryNotFound);
+                return new Result<Category>(false, Message.CategoryNotFound);
             }
             return new Result<Category>(true, category);
         }
@@ -36,7 +36,7 @@ namespace OvgBlog.Business.Services
 
         public async Task<IResult<Category>> Create(Category category)
         {
-            if (category==null || string.IsNullOrEmpty(category.Name) || string.IsNullOrEmpty(category.SeoUrl))
+            if (category == null || string.IsNullOrEmpty(category.Name) || string.IsNullOrEmpty(category.SeoUrl))
             {
                 return new Result<Category>(false, Message.ModelNotValid);
             }
@@ -48,20 +48,20 @@ namespace OvgBlog.Business.Services
             category.Id = Guid.NewGuid();
             category.CreatedDate = DateTime.Now;
             await _categoryRepository.Create(category);
-            return new Result<Category>(true,category);            
+            return new Result<Category>(true, category);
         }
 
         public async Task<IResult<object>> Delete(Guid id)
         {
-            if (id==Guid.Empty)
+            if (id == Guid.Empty)
             {
-                return new Result<object>(false,Message.CategoryNotFound);
+                return new Result<object>(false, Message.CategoryNotFound);
             }
             var categoryEntity = await _categoryRepository.Get(x => x.Id == id && !x.IsDeleted);
-            if (categoryEntity==null)
+            if (categoryEntity == null)
             {
-                return new Result<object>(false,Message.CategoryNotFound);
-            }         
+                return new Result<object>(false, Message.CategoryNotFound);
+            }
             var articleEntities = await _articleRelationRepository.GetAll(x => x.CategoryId == categoryEntity.Id && !x.IsDeleted);
             foreach (var item in articleEntities)
             {
@@ -71,7 +71,7 @@ namespace OvgBlog.Business.Services
             }
             categoryEntity.IsDeleted = true;
             categoryEntity.DeletedDate = DateTime.Now;
-           await _categoryRepository.Update(categoryEntity);
+            await _categoryRepository.Update(categoryEntity);
             return new Result<object>(true);
         }
 
@@ -79,34 +79,34 @@ namespace OvgBlog.Business.Services
         {
             if (string.IsNullOrEmpty(name))
             {
-                return new Result<Category>(false,Message.NameNotFound);
+                return new Result<Category>(false, Message.NameNotFound);
             }
             var category = await _categoryRepository.Get(x => x.Name == name && !x.IsDeleted);
             if (category == null)
             {
-                return new Result<Category>(false,Message.CategoryNotFound);
+                return new Result<Category>(false, Message.CategoryNotFound);
             }
             return new Result<Category>(true, category);
         }
 
         public async Task<IResult<IEnumerable<Category>>> GetAll()
         {
-            var list = await _categoryRepository.GetAll(x=> !x.IsDeleted);
+            var list = await _categoryRepository.GetAll(x => !x.IsDeleted);
             return new Result<IEnumerable<Category>>(true, list);
         }
 
         public async Task<IResult<Category>> GetById(Guid id)
         {
-            if (id== Guid.Empty)
+            if (id == Guid.Empty)
             {
                 return new Result<Category>(false, Message.IdIsNotValid);
             }
             var categoryEntity = await _categoryRepository.Get(x => x.Id == id && !x.IsDeleted);
-            if (categoryEntity==null)
+            if (categoryEntity == null)
             {
-                return new Result<Category>(false,Message.IdIsNotValid);
+                return new Result<Category>(false, Message.IdIsNotValid);
             }
-            return new Result<Category>(true,categoryEntity);
+            return new Result<Category>(true, categoryEntity);
         }
 
         public async Task<IResult<Category>> Update(Category category)
@@ -116,7 +116,7 @@ namespace OvgBlog.Business.Services
                 return new Result<Category>(false, Message.ModelNotValid);
             }
             var categoryEntity = await _categoryRepository.Get(x => x.Id == category.Id && !x.IsDeleted);
-            if (categoryEntity==null)
+            if (categoryEntity == null)
             {
                 return new Result<Category>(false, Message.CategoryNotFound);
             }

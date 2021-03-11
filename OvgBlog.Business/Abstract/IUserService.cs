@@ -1,5 +1,5 @@
 ﻿using OvgBlog.Business.Constants;
-using OvgBlog.DAL.Data.Entities;
+using OvgBlog.DAL.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,6 +13,6 @@ namespace OvgBlog.Business.Abstract
         Task<IResult<object>> Delete(Guid id);
         Task<IResult<User>> Update(User user);
         Task<IResult<User>> GetById(Guid id);
-        Task<IResult<bool>> CheckUser(string userName,string password);
+        Task<IResult<bool>> CheckUser(string userName, string password);
     }
 }
