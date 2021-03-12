@@ -33,20 +33,21 @@ namespace OvgBlog.UI.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var response = await _articleService.GetBySeoUrl(seoUrl);
+            var response = await _articleService.GetBySeoUrl(seoUrl);            
             if (!response.Success)
             {
                 return RedirectToAction("Index", "Home");
             }
+            response.Data.Comments = response.Data.Comments.Where(x => !x.IsDeleted).ToList();
             var articleTags = await _tagService.GetAll();
             if (articleTags.Data == null || !articleTags.Success || response.Data.ArticleTagRelations.Count == 0)
             {
-                var model = response.Data.Adapt<ArticleDetailViewModel>();
+                var model = response.Data.Adapt<ArticleDetailViewModel>();               
                 var userResponse = await _userService.GetById(response.Data.UserId);
                 if (userResponse.Success)
                 {
                     model.UserName = userResponse.Data.Name;
-                }
+                }               
                 return View(model);
             }
             else

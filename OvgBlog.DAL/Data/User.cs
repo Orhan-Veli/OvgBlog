@@ -1,11 +1,12 @@
-﻿using System;
+﻿using OvgBlog.DAL.Abstract;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
 
 namespace OvgBlog.DAL.Data
 {
-    public partial class User
+    public partial class User : IEntity
     {
         public User()
         {

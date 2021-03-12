@@ -12,6 +12,9 @@
         <div class="card">
             <div class="card-header card-header-primary">
                 <h4 class="card-title ">Category Table</h4>
+                <a href="javascript:;" class="button-container" type="button" id="myForm">
+                    <img src="~/uploads/PlusIcon.png" style="width:20px; height:20px;" />
+                </a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -28,10 +31,10 @@
                         </th>
                         <th>
                             Proses
-                        </th>                        
+                        </th>
                         </thead>
                         <tbody>
-                            @{                                
+                            @{
                                 foreach (var item in Model)
                                 {
                                     <tr id="row-@i">
@@ -54,9 +57,7 @@
                             }
                         </tbody>
                     </table>
-
                 </div>
-
             </div>
         </div>
     </div>
