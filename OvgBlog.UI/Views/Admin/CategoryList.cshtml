@@ -8,32 +8,43 @@
 
 }
 <body>
-    <div class="container">
-        <div class="row">
-
-
-            <div class="col-md-12">
-                @*<h4>Category Table <span><a asp-action="AddCategory" class="PositionOfSign" type="button"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>*@
-                <h4>Category Table <span><a href="javascript:;" id="myForm" data-toggle="modal" data-target="#myModal" type="button"> <img src="~/uploads/PlusIcon.png" width="20" style="margin-right: 10px;" /></a></span> </h4>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title ">Category Table</h4>
+            </div>
+            <div class="card-body">
                 <div class="table-responsive">
-                    <table id="myTable" class="table table-bordred table-striped">
-                        <thead>
-                        <th>Name</th>
-                        <th>SeoUrl</th>
-                        <th>Image</th>
-                        <th>Process</th>
+                    <table class="table">
+                        <thead class=" text-primary">
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            SeoUrl
+                        </th>
+                        <th>
+                            ImageUrl
+                        </th>
+                        <th>
+                            Proses
+                        </th>                        
                         </thead>
                         <tbody>
-                            @{
+                            @{                                
                                 foreach (var item in Model)
                                 {
                                     <tr id="row-@i">
-                                        <td>@item.Name</td>
-                                        <td>@item.SeoUrl</td>
-                                        <td>@item.ImageUrl</td>
                                         <td>
-                                            @*<a href="@Url.Action("UpdateCategory", "Admin", new { item.Id })" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a>*@
-                                            @*<a href="javascript:;" id="myForm" data-toggle="modal" data-target="#myModal" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a>*@
+                                            @item.Name
+                                        </td>
+                                        <td>
+                                            @item.SeoUrl
+                                        </td>
+                                        <td>
+                                            @item.ImageUrl
+                                        </td>
+                                        <td>
                                             <a href="javascript:;" onclick="UpdateCategory('@item.Id','@item.Name','@item.SeoUrl','@item.ImageUrl')" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a>
                                             <a href="javascript:;" onclick="DeleteCategory('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a>
                                         </td>

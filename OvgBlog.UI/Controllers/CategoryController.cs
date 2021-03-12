@@ -54,7 +54,7 @@ namespace OvgBlog.UI.Controllers
             {
                 return View(new List<ArticleListViewModel>());
             }
-            var map = articleResult.Data.Adapt<List<ArticleListViewModel>>();
+            var map = articleResult.Data.OrderByDescending(x=> x.CreatedDate).Adapt<List<ArticleListViewModel>>();
             return View(map);
         }
     }

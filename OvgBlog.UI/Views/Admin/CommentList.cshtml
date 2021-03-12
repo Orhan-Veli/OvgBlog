@@ -6,17 +6,27 @@
 @section styles {
 }
 <body>
-    <div class="container">
-        <div class="row">
-
-
-            <div class="col-md-12">
-            <h4>Comment Table </h4>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title ">Comment Table</h4>
+            </div>
+            <div class="card-body">
                 <div class="table-responsive">
-                    <table id="mytable" class="table table-bordred table-striped">
-                        <thead>
-                        <th>Name</th>
-                        <th>SeoUrl</th>
+                    <table class="table">
+                        <thead class=" text-primary">
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Body
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th>
+                            Delete
+                        </th>
                         </thead>
                         <tbody>
                             @{
@@ -24,11 +34,17 @@
                                 foreach (var item in Model)
                                 {
                                     <tr id="row-@i">
-                                        <td>@item.Name</td>
-                                        <td>@item.Body</td>
-                                        <td>@item.Email</td>
                                         <td>
-                                            <a href="javascript:;" onclick="DeleteComment('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a>
+                                            @item.Name
+                                        </td>
+                                        <td>
+                                            @item.Body
+                                        </td>
+                                        <td>
+                                            @item.Email
+                                        </td>
+                                        <td class="text-primary">
+                                            <a href="javascript:;" onclick="DeleteTag('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a>
                                         </td>
                                     </tr>
                                     i++;
@@ -36,9 +52,7 @@
                             }
                         </tbody>
                     </table>
-
                 </div>
-
             </div>
         </div>
     </div>
@@ -66,7 +80,8 @@
     </div>
 </body>
 @section scripts {
-    <script type="text/javascript">        
+    <script type="text/javascript">
+
         function DeleteComment(id, rowNumber) {
             $.ajax({
                 url: '@Url.Action("DeleteComment", "Admin")',

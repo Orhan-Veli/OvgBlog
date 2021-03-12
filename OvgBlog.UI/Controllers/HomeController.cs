@@ -37,7 +37,7 @@ namespace OvgBlog.UI.Controllers
                                     ? (item.Body?.Substring(0, 100)?.ToString() ?? "") + " ..."
                                     : item.Body);
             }
-            model.Articles = articleList.Take(10).ToList();
+            model.Articles = articleList.OrderByDescending(x=> x.CreatedDate).Take(10).ToList();
             var categoryList = new List<CategoryListViewModel>();
             var categoryResult = await _categoryService.GetAll();
             if (categoryResult.Success && categoryResult.Data != null)

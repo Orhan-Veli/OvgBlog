@@ -2,38 +2,55 @@
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h4>Article Table <span><a asp-action="AddArticle" class="PositionOfSign" type="button"> <img src="~/uploads/PlusIcon.png" width="20px" /></a></span> </h4>
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header card-header-primary">
+            <h4 class="card-title ">Article Table</h4>
+        </div>
+        <div class="card-body">
             <div class="table-responsive">
-                <table id="mytable" class="table table-bordred table-striped">
-                    <thead>
-                        
-                    <th>Title</th>
-                    <th>SeoUrl</th>
-                    <th>Image</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
+                <table class="table">
+                    <thead class=" text-primary">
+                    <th>
+                        Title
+                    </th>
+                    <th>
+                        SeoUrl
+                    </th>
+                    <th>
+                        Image
+                    </th>
+                    <th>
+                        Edit
+                    </th>
+                    <th>
+                        Delete
+                    </th>
                     </thead>
-                    @{ 
-                        int i = 1;
-                        foreach (var item in Model) {
-                            <tbody>
-
-                                <tr id="row-@i">                            
-                                    <td>@item.Title</td>
-                                    <td>@item.SeoUrl</td>
-                                    <td>@item.ImageUrl</td>
+                    <tbody>
+                        @{
+                            int i = 1;
+                            foreach (var item in Model)
+                            {
+                                <tr id="row-@i">
+                                    <td>
+                                        @item.Title
+                                    </td>
+                                    <td>
+                                        @item.SeoUrl
+                                    </td>
+                                    <td>
+                                        @item.ImageUrl
+                                    </td>
                                     <form method="post">
                                         <td><a class="button-container" asp-route-Id="@item.Id" asp-action="UpdateArticle" name="@item.Id" type="button"><img src="/uploads/Edit.png" width="20px"></a></td>
                                         <td><a href="javascript:;" onclick="DeleteArticle('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a></td>
                                     </form>
                                 </tr>
-                            </tbody>
-                            i++;
+                                i++;
+                            }
                         }
-                    }
+                    </tbody>
                 </table>
             </div>
 

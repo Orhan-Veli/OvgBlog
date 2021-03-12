@@ -36,9 +36,16 @@ namespace OvgBlog.UI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
-        {
-            return View();
+        public async Task<IActionResult> Index()
+        {                 
+            var adminViewModelCounts = new AdminListViewModel
+            {
+                ArticleCount = _articleService.GetAll().Result.Data.Count(),
+                CategoryCount = _categoryService.GetAll().Result.Data.Count(),
+                TagCount = _tagService.GetAll().Result.Data.Count(),
+                CommentCount = _commentService.GetAll().Result.Data.Count()            
+            };
+            return View(adminViewModelCounts);
         }
 
         [HttpGet]

@@ -4,47 +4,50 @@
 }
 
 @section styles {
-    <style type="text/css">
-        .PositionOfSign {
-            margin-right: 10px;
-        }
-    </style>
+  
 }
 <body>
-    <div class="container">
-        <div class="row">
-
-
-            <div class="col-md-12">
-                <div id="PlaceHolderElement"></div>
-                @*<h4>Category Table <span><a asp-action="AddCategory" class="PositionOfSign" type="button"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>*@
-                <h4>Tag Table <span><a type="button" class="PositionOfSign" data-toggle="ajax-modal" data-target="#myModal"> <img src="~/uploads/PlusIcon.png" width="20" /></a></span> </h4>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title ">Tag Table</h4>                
+            </div>
+            <div class="card-body">
                 <div class="table-responsive">
-                    <table id="mytable" class="table table-bordred table-striped">
-                        <thead>
-                        <th>Name</th>
-                        <th>SeoUrl</th>             
+                    <table class="table">
+                        <thead class=" text-primary">                        
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            SeoUrl
+                        </th>
+                        <th>
+                            Delete
+                        </th>                        
                         </thead>
                         <tbody>
                             @{
                                 int i = 1;
                                 foreach (var item in Model)
                                 {
-                                    <tr id="row-@i">
-                                        <td>@item.Name</td>
-                                        <td>@item.SeoUrl</td>                                        
-                                        <td>                                           
-                                            <a href="javascript:;" onclick="DeleteTag('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a>
-                                        </td>
-                                    </tr>
+                                <tr id="row-@i">
+                                    <td>
+                                       @item.Name
+                                    </td>
+                                    <td>
+                                        @item.SeoUrl
+                                    </td>
+                                    <td class="text-primary">
+                                        <a href="javascript:;" onclick="DeleteTag('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a>
+                                    </td>
+                                </tr>
                                     i++;
                                 }
                             }
                         </tbody>
                     </table>
-
                 </div>
-
             </div>
         </div>
     </div>
@@ -71,6 +74,9 @@
         </div>
     </div>
 </body>
+
+
+
 @section scripts {
     <script type="text/javascript">
         function DeleteTag(id, rowNumber) {
