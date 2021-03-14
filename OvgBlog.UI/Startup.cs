@@ -60,7 +60,8 @@ namespace OvgBlog.UI
             services.AddTransient<IValidator<CategoryAddViewModel>, CategoryAddViewModelValidator>();
             services.AddTransient<IValidator<ArticleViewModel>, ArticleViewModelValidator>();
             services.AddTransient<IValidator<TagViewModel>, TagViewModelValidator>();
-
+            services.AddTransient<IValidator<SendEmailViewModel>, SendEmailViewModelValidator>();
+          
 
             services.Configure<CookiePolicyOptions>(options =>
             {

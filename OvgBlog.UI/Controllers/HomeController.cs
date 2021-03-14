@@ -1,6 +1,9 @@
-﻿using Mapster;
+﻿using MailKit.Net.Smtp;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MimeKit;
 using OvgBlog.Business.Abstract;
 using OvgBlog.UI.Models;
 using System;
@@ -16,16 +19,22 @@ namespace OvgBlog.UI.Controllers
         private readonly IArticleService _articleService;
         private readonly ICategoryService _categoryService;
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger, IArticleService articleService, ICategoryService categoryService)
+        public HomeController(ILogger<HomeController> logger, 
+            IArticleService articleService, 
+            ICategoryService categoryService,
+            IConfiguration configuration
+            )
         {
+            _configuration = configuration;
             _logger = logger;
             _articleService = articleService;
             _categoryService = categoryService;
         }
 
         public async Task<IActionResult> Index()
-        {
+        {          
             var model = new HomeViewModel();
 
             var articleList = new List<ArticleListViewModel>();
@@ -37,7 +46,7 @@ namespace OvgBlog.UI.Controllers
                                     ? (item.Body?.Substring(0, 100)?.ToString() ?? "") + " ..."
                                     : item.Body);
             }
-            model.Articles = articleList.OrderByDescending(x=> x.CreatedDate).Take(10).ToList();
+            model.Articles = articleList.OrderByDescending(x=> x.CreatedDate).Take(3).ToList();
             var categoryList = new List<CategoryListViewModel>();
             var categoryResult = await _categoryService.GetAll();
             if (categoryResult.Success && categoryResult.Data != null)
@@ -66,6 +75,38 @@ namespace OvgBlog.UI.Controllers
         {
 
             return View();
+        }
+        [HttpPost]
+        public IActionResult SendEmail(SendEmailViewModel sendEmailViewModel)
+        {
+            
+
+            if (ModelState.IsValid)
+            {
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(sendEmailViewModel.Name, sendEmailViewModel.Email));
+                message.To.Add(new MailboxAddress("Orhan", _configuration["GmailReceiverMail"].ToString()));
+                message.Subject = sendEmailViewModel.Name;
+                message.Body = new TextPart("plain")
+                {
+                    Text = "\nEmail:\n" + sendEmailViewModel.Email+ "\nAdı soyadı:\n" + sendEmailViewModel.Name + "\nMesajı:\n" + sendEmailViewModel.Body
+                    
+
+                };
+                using (var client = new SmtpClient())
+                {
+                    client.Connect("smtp.gmail.com", 587, false);                  
+                    client.Authenticate(_configuration["GmailSenderMail"].ToString(), _configuration["GmailSenderPassword"].ToString());
+                    client.Send(message);
+                    client.Disconnect(true);
+                }
+                return Json(new JsonResultModel<SendEmailViewModel>(true, "Gönderildi."));
+            }
+            else
+            {
+                return Json(new JsonResultModel<SendEmailViewModel>(true, "Eksik alanları doldurun."));
+            }
+
         }
     }
 }
