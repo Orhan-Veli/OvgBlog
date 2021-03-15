@@ -9,24 +9,9 @@
     <div class="header-title">@Model.Title</div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Ana Sayfaya Git</a></li>
-            @*<li class="breadcrumb-item active" aria-current="page">Components</li>*@
+            <li class="breadcrumb-item"><a href="/">Ana Sayfaya Git</a></li>      
         </ol>
     </nav>
-    <style>
-
-        #corner 
-        {
-            border-radius: 25px;
-            background: url(paper.gif);
-            background-position: left top;
-            background-repeat: repeat;
-            padding: 20px;
-            width: 200px;
-            height: 150px;
-        }
-
-    </style>
 </header>
 <!-- End Of Page Header -->
 <body>
@@ -37,13 +22,13 @@
             <a href="javascript:;"><i class="fa fa-user-circle-o"></i> Yazar: Admin</a>
             <a href="javascript:;"><i class="fa fa-calendar-o"></i> Tarih: @Model.CreatedDate.ToString("dd.MM.yyyy")</a>
         </p>
-        <img src="~/@Model.ImageUrl" style="width: 100%;" /><br><br>
+        <img src="~/uploads/@Model.ImageUrl" style="width: 100%;" /><br><br>
         <p>
             @Model.Body
-        </p>
+        </p><br />
         @foreach (var item in Model.Tags)
         {
-            <div> <p id="corner">@item.Name</p></div>
+            <span class="badge rounded-pill bg-light text-dark">@item.Name</span>
         }
         <!-- testimonial section -->
         <section class="section" id="testmonial">

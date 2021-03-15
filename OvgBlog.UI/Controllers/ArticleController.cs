@@ -27,6 +27,7 @@ namespace OvgBlog.UI.Controllers
         //[Route("{seoUrl}")]
         [HttpGet]
         public async Task<IActionResult> Index(string seoUrl)
+        
         {
             if (string.IsNullOrEmpty(seoUrl))
             {
@@ -52,10 +53,10 @@ namespace OvgBlog.UI.Controllers
             }
             else
             {
-                var model = response.Data.Adapt<ArticleDetailViewModel>();
-                var model1 = articleTags.Data.Where(x => x.Id == response.Data.ArticleTagRelations.FirstOrDefault().TagId);
-
-                foreach (var item in model1)
+                var articleTagIds = response.Data.ArticleTagRelations.Select(x => x.TagId).ToList();
+                var tagListResponse = await _tagService.GetByIds(articleTagIds);
+                var model = response.Data.Adapt<ArticleDetailViewModel>();               
+                foreach (var item in tagListResponse.Data)
                 {
                     model.Tags.Add(item.Adapt<TagViewModel>());
                 }

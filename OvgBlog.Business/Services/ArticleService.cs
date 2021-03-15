@@ -55,27 +55,6 @@ namespace OvgBlog.Business.Services
             }
             await _categoryRelationRepository.Create(new ArticleCategoryRelation { Id = Guid.NewGuid(), ArticleId = article.Id, CategoryId = article.ArticleCategoryRelations.FirstOrDefault().CategoryId, CreatedDate = DateTime.Now });
 
-            //try
-            //{
-            //    await _categoryRelationRepository.Create(new ArticleCategoryRelation { Id = Guid.NewGuid(), ArticleId = article.Id, CategoryId = article.ArticleCategoryRelations.FirstOrDefault().CategoryId, CreatedDate = DateTime.Now });
-            //    foreach (var item in article.ArticleTagRelations)
-            //    {
-            //        var tagModel = new ArticleTagRelation
-            //        {
-            //            Id = Guid.NewGuid(),
-            //            TagId = item.Tag.Id,
-            //            ArticleId = article.Id,                       
-            //            CreatedDate = DateTime.Now
-            //        };
-
-            //        await _tagRelationRepository.Create(tagModel);
-            //    }
-            //}
-            //catch (Exception)
-            //{
-            //    await _articleRepository.Delete(article.Id);
-            //}
-
             return new Result<Article>(true, article);
         }
 
@@ -152,14 +131,14 @@ namespace OvgBlog.Business.Services
             var expressions = new List<Expression<Func<Article, object>>>();
             expressions.Add(x => x.Comments);
             expressions.Add(x => x.ArticleCategoryRelations);
+            expressions.Add(x => x.ArticleTagRelations);          
             var articleEntity = await _articleRepository.Get((x => x.SeoUrl == seoUrl && !x.IsDeleted), expressions);
             if (articleEntity == null)
             {
                 return new Result<Article>(false, Message.ArticleIsNotFound);
-            }
+            }            
             return new Result<Article>(true, articleEntity);
         }
-
         public async Task<IResult<Article>> Update(Article article)
         {
             if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl) || article.UserId == Guid.Empty || article.Id == Guid.Empty)

@@ -79,6 +79,16 @@ namespace OvgBlog.Business.Services
             return new Result<Tag>(true, tagEntity);
         }
 
+        public async Task<IResult<IEnumerable<Tag>>> GetByIds(List<Guid> ids)
+        {
+            if (ids == null ||ids.Count==0)
+            {
+                return new Result<IEnumerable<Tag>>(false, Message.IdIsNotValid);
+            }
+            var tagEntities = await _tagRepository.GetAll(x=> ids.Contains(x.Id));
+            return new Result<IEnumerable<Tag>>(true,tagEntities);
+        }
+
         public async Task<IResult<Tag>> Update(Tag tag)
         {
             if (tag == null || string.IsNullOrEmpty(tag.Name) || string.IsNullOrEmpty(tag.SeoUrl))
