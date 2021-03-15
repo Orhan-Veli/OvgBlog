@@ -8,7 +8,7 @@
             <h4 class="card-title">Update Article</h4>
         </div>
         <div class="card-body">
-            <form method="post">
+            <form method="post" enctype="multipart/form-data" >
                 <input asp-for="Id" hidden />
                 <div class="row">
                     <div class="col-md-6">
@@ -30,7 +30,7 @@
                     <div class="col-md-6">
                         <div class="form-group bmd-form-group">
                             <label class="bmd-label-floating">Image</label>
-                            <input type="text" asp-for="ImageUrl" class="form-control">
+                            <input type="file" id="FileImageUrl" name="FileImageUrl" class="form-control">
                         </div>
                     </div>
                 </div>

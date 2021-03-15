@@ -1,5 +1,7 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OvgBlog.Business.Abstract;
@@ -8,6 +10,7 @@ using OvgBlog.UI.Extentions;
 using OvgBlog.UI.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -24,8 +27,15 @@ namespace OvgBlog.UI.Controllers
         private readonly IArticleService _articleService;
         private readonly ITagService _tagService;
         private readonly ICommentService _commentService;
-
-        public AdminController(ILogger<AdminController> logger, IUserService userService, ICategoryService categoryService, IArticleService articleService, ITagService tagService, ICommentService commentService)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public AdminController(ILogger<AdminController> logger,
+            IUserService userService,
+            ICategoryService categoryService,
+            IArticleService articleService,
+            ITagService tagService,
+            ICommentService commentService,
+            IWebHostEnvironment webHostEnvironment
+            )
         {
             _logger = logger;
             _userService = userService;
@@ -33,6 +43,8 @@ namespace OvgBlog.UI.Controllers
             _articleService = articleService;
             _tagService = tagService;
             _commentService = commentService;
+
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet]
@@ -122,13 +134,24 @@ namespace OvgBlog.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> AddArticle(ArticleAddViewModel model)
 
-        {
+        {            
             //Needs to move business
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            string fileName = Path.GetFileNameWithoutExtension(model.FileImageUrl.FileName);
+            string extension = Path.GetExtension(model.FileImageUrl.FileName);
+            string path = Path.Combine(wwwRootPath+"/uploads/",fileName + extension);
+            using (var fileStream = new FileStream(path, FileMode.Create))
+            {
+
+                await model.FileImageUrl.CopyToAsync(fileStream);
+
+            }
+            model.ImageUrl = model.FileImageUrl.FileName;
             model.SeoUrl = model.SeoUrl.ReplaceSeoUrl();
             var result = await _articleService.GetBySeoUrl(model.SeoUrl);
             if (result.Success && result.Data != null)
@@ -220,7 +243,21 @@ namespace OvgBlog.UI.Controllers
                 ModelState.AddModelError(string.Empty, "Category is not found.");
                 return RedirectToAction("ArticleListView");
             }
-            result.Data.ImageUrl = articleUpdateViewModel.ImageUrl;
+            var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", result.Data.ImageUrl);
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            string fileName = Path.GetFileNameWithoutExtension(articleUpdateViewModel.FileImageUrl.FileName);
+            string extension = Path.GetExtension(articleUpdateViewModel.FileImageUrl.FileName);
+            string path = Path.Combine(wwwRootPath + "/uploads/", fileName + extension);
+            using (var fileStream = new FileStream(path, FileMode.Create))
+            {
+                await articleUpdateViewModel.FileImageUrl.CopyToAsync(fileStream);
+            }
+            result.Data.ImageUrl = articleUpdateViewModel.FileImageUrl.FileName;
+            //result.Data.ImageUrl = articleUpdateViewModel.ImageUrl;
             result.Data.SeoUrl = articleUpdateViewModel.SeoUrl;
             result.Data.Body = articleUpdateViewModel.Body;
             result.Data.Title = articleUpdateViewModel.Title;
@@ -242,7 +279,7 @@ namespace OvgBlog.UI.Controllers
         public async Task<IActionResult> TagList()
         {
             var list = await _tagService.GetAll();
-            var tagList = list.Data.Adapt<List<TagViewModel>>();
+            var tagList = list.Data.Where(x=> !x.IsDeleted).Adapt<List<TagViewModel>>();
             return View(tagList);
         }
         [HttpDelete]
@@ -281,7 +318,13 @@ namespace OvgBlog.UI.Controllers
             {
                 return Json(new JsonResultModel<Article>(false, "Geçersiz article id"));
             }
-            var deleteResult = await _articleService.Delete(id);
+            var imageModel = await _articleService.GetById(id);
+            var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", imageModel.Data.ImageUrl);
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+            var deleteResult = await _articleService.Delete(id);            
             return Json(new JsonResultModel<Article>(deleteResult.Success, deleteResult.Message));
         }
     }
