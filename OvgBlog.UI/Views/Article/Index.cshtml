@@ -9,7 +9,7 @@
     <div class="header-title">@Model.Title</div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Ana Sayfaya Git</a></li>      
+            <li class="breadcrumb-item"><a href="/">Ana Sayfaya Git</a></li>
         </ol>
     </nav>
 </header>
@@ -20,9 +20,10 @@
         <h3 class="mt-5">@Model.Title</h3>
         <p class="blog-card-caption">
             <a href="javascript:;"><i class="fa fa-user-circle-o"></i> Yazar: Admin</a>
+            <a href="javascript:;"><i class="fa fa-user-circle-o"></i> Category: Admin</a>
             <a href="javascript:;"><i class="fa fa-calendar-o"></i> Tarih: @Model.CreatedDate.ToString("dd.MM.yyyy")</a>
         </p>
-        <img src="~/uploads/@Model.ImageUrl" style="width: 100%;" /><br><br>
+        <img src="~/uploads/@Model.ImageUrl" style="width: 50%; height:50%" /><br><br>
         <p>
             @Model.Body
         </p><br />
@@ -86,11 +87,11 @@
     </div>
 </body>
 
-@section scripts{ 
+@section scripts{
     <script type="text/javascript">
         $('#contact #sendVal').on('click', function () {
-        
-         var ArticleId = "@Model.Id"; @*$("#@Model.Id").val()*@       
+
+         var ArticleId = "@Model.Id"; @*$("#@Model.Id").val()*@
          var name = $("#Name").val();
          var email = $("#Email").val();
          var body = $("#Body").val();
@@ -105,7 +106,7 @@
                 }
                 else
                 {
-                    alert('işlem gerçekleştirilemedi.');
+                    alert(result.message);
                 }
             }
         });

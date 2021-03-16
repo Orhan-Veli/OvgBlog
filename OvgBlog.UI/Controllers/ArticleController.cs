@@ -34,7 +34,7 @@ namespace OvgBlog.UI.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var response = await _articleService.GetBySeoUrl(seoUrl);            
+            var response = await _articleService.GetBySeoUrl(seoUrl);           
             if (!response.Success)
             {
                 return RedirectToAction("Index", "Home");
@@ -55,10 +55,11 @@ namespace OvgBlog.UI.Controllers
             {
                 var articleTagIds = response.Data.ArticleTagRelations.Select(x => x.TagId).ToList();
                 var tagListResponse = await _tagService.GetByIds(articleTagIds);
-                var model = response.Data.Adapt<ArticleDetailViewModel>();               
+                
+                var model = response.Data.Adapt<ArticleDetailViewModel>();                
                 foreach (var item in tagListResponse.Data)
                 {
-                    model.Tags.Add(item.Adapt<TagViewModel>());
+                    model.Tags.Add(item.ArticleTagRelations.Where(x=> !x.IsDeleted).Adapt<TagViewModel>());
                 }
                 var userResponse = await _userService.GetById(response.Data.UserId);
                 if (userResponse.Success)

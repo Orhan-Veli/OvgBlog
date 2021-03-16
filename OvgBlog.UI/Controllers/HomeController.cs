@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MimeKit;
 using OvgBlog.Business.Abstract;
+using OvgBlog.UI.Extentions;
 using OvgBlog.UI.Models;
 using System;
 using System.Collections.Generic;
@@ -78,11 +79,13 @@ namespace OvgBlog.UI.Controllers
         }
         [HttpPost]
         public IActionResult SendEmail(SendEmailViewModel sendEmailViewModel)
-        {
-            
-
+        {           
             if (ModelState.IsValid)
             {
+                if (!sendEmailViewModel.Email.EmailValidation())
+                {
+                    return Json(new JsonResultModel<SendEmailViewModel>(false, "Lütfen doğru bir mail adresi giriniz."));
+                }
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(sendEmailViewModel.Name, sendEmailViewModel.Email));
                 message.To.Add(new MailboxAddress("Orhan", _configuration["GmailReceiverMail"].ToString()));
@@ -90,8 +93,6 @@ namespace OvgBlog.UI.Controllers
                 message.Body = new TextPart("plain")
                 {
                     Text = "\nEmail:\n" + sendEmailViewModel.Email+ "\nAdı soyadı:\n" + sendEmailViewModel.Name + "\nMesajı:\n" + sendEmailViewModel.Body
-                    
-
                 };
                 using (var client = new SmtpClient())
                 {
@@ -104,7 +105,7 @@ namespace OvgBlog.UI.Controllers
             }
             else
             {
-                return Json(new JsonResultModel<SendEmailViewModel>(true, "Eksik alanları doldurun."));
+                return Json(new JsonResultModel<SendEmailViewModel>(false, "Eksik alanları doldurun."));
             }
 
         }

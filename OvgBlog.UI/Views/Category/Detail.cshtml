@@ -4,6 +4,31 @@
     int i = 0;
 }
 
+
+
+@{
+    var val = "";
+    if (Model.Count == 0)
+    {
+         val = "Bu kategoride herhangi bir yazı paylaşılmamıştır.";
+    }
+    else
+    {
+        val = @Model.FirstOrDefault().CategorySeoUrl.ToUpper();
+    }
+ }
+<header class="header header-mini">
+    <div class="header-title">
+        @val
+
+    </div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Ana Sayfaya Git</a></li>
+        </ol>
+    </nav>
+</header>
+
 @foreach (var item in Model)
 {
     string rightClass = (i % 2 == 0) ? "order-lg-2" : "";

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OvgBlog.Business.Abstract;
 using OvgBlog.DAL.Data;
+using OvgBlog.UI.Extentions;
 using OvgBlog.UI.Models;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace OvgBlog.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> AddComment(CommentAddViewModel commentAddViewModel)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || !commentAddViewModel.Email.EmailValidation())
             {
                 return Json(new JsonResultModel<CommentAddViewModel>(false, "Model is not valid."));
             }

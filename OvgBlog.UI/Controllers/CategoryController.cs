@@ -55,6 +55,11 @@ namespace OvgBlog.UI.Controllers
                 return View(new List<ArticleListViewModel>());
             }
             var map = articleResult.Data.OrderByDescending(x=> x.CreatedDate).Adapt<List<ArticleListViewModel>>();
+            if (map.Count!=0)
+            {
+                map.FirstOrDefault().CategorySeoUrl = seoUrl;
+            }
+           
             return View(map);
         }
     }

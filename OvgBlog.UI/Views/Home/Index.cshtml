@@ -148,14 +148,16 @@
         $("#sendEmail").on('click', function () {
             var name = $("#Name").val();
             var email = $("#Email").val();
-            var body = $("#Body").val();
+            var body = $("#Body").val();        
             $.ajax({
                 type: "post",
                 data: { name, email, body },
                 url: "@Url.Action("SendEmail", "Home")",
                 success: function (result) {
                     if (!result.success) {
-                        toastr.error(result.message ?? 'sistemsel hata oluştu');
+                       
+                        //toastr.error(result.message ?? "Boş alanları doldurunuz.");
+                        alert("Boş alanları doldurunuz veya geçerli değerler giriniz.");
                     }
                     else {
                         location.reload();

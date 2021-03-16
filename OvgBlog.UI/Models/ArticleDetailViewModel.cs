@@ -16,7 +16,7 @@ namespace OvgBlog.UI.Models
         public string Body { get; set; }
         public string SeoUrl { get; set; }
         public string ImageUrl { get; set; }
-        public string UserName { get; set; }
+        public string UserName { get; set; }      
         public DateTime CreatedDate { get; set; }
         public List<CommentViewModel> Comments { get; set; }
 
