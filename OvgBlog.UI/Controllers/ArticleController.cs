@@ -25,7 +25,7 @@ namespace OvgBlog.UI.Controllers
 
         // ovgblog.com/article/yazinin-basligi
         //[Route("{seoUrl}")]
-        [HttpGet]
+        [HttpGet("article/{seoUrl}")]
         public async Task<IActionResult> Index(string seoUrl)
         
         {

@@ -10,12 +10,6 @@
         <div class="card-body">
             <form method="post" enctype="multipart/form-data">
                 <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-group bmd-form-group">
-                            <label class="bmd-label-floating">Article Body</label>
-                            <input type="text" name="Body" class="form-control">
-                        </div>
-                    </div>
                     <div class="col-md-4">
                         <div class="form-group bmd-form-group">
                             <label class="bmd-label-floating">Seo Url</label>
@@ -34,16 +28,8 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group bmd-form-group">
-                            <label class="bmd-label-floating">Image</label>                           
+                            <label class="bmd-label-floating">Image</label>
                             <input type="file" id="FileImageUrl" name="FileImageUrl" class="form-control">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group bmd-form-group">
-                            <label class="bmd-label-floating">Tag Name</label>
-                            <input type="text" name="TagName" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -55,6 +41,18 @@
                             <option value="@item.Id">@item.Name</option>
                         }
                     </select>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group bmd-form-group">
+                            <label class="bmd-label-floating">Tag Name</label>
+                            <input type="text" name="TagName" class="form-control">
+                        </div>
+                    </div>
+                </div>                
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label">Article Body</label>
+                    <textarea class="form-control" name="Body" rows="3"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary pull-right">Add</button>
                 <div class="clearfix"></div>
