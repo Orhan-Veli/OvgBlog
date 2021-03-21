@@ -31,7 +31,7 @@ namespace OvgBlog.Business.Services
             {
                 return new Result<Article>(false, Message.ModelNotValid);
             }
-            article.UserId = Guid.Parse("B992346C-E0CC-4EBA-A16B-2B915BB73A51");
+            article.UserId = (await _userRepository.Get()).Id;
             var userEntity = await _userRepository.Get(x => x.Id == article.UserId && !x.IsDeleted);
             if (userEntity == null)
             {

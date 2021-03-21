@@ -28,13 +28,15 @@ namespace OvgBlog.UI.Controllers
         private readonly ITagService _tagService;
         private readonly ICommentService _commentService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IContactService _contactService;
         public AdminController(ILogger<AdminController> logger,
             IUserService userService,
             ICategoryService categoryService,
             IArticleService articleService,
             ITagService tagService,
             ICommentService commentService,
-            IWebHostEnvironment webHostEnvironment
+            IWebHostEnvironment webHostEnvironment,
+            IContactService contactService
             )
         {
             _logger = logger;
@@ -43,8 +45,8 @@ namespace OvgBlog.UI.Controllers
             _articleService = articleService;
             _tagService = tagService;
             _commentService = commentService;
-
             _webHostEnvironment = webHostEnvironment;
+            _contactService = contactService;
         }
 
         [HttpGet]
@@ -55,7 +57,8 @@ namespace OvgBlog.UI.Controllers
                 ArticleCount = _articleService.GetAll().Result.Data.Count(),
                 CategoryCount = _categoryService.GetAll().Result.Data.Count(),
                 TagCount = _tagService.GetAll().Result.Data.Count(),
-                CommentCount = _commentService.GetAll().Result.Data.Count()            
+                CommentCount = _commentService.GetAll().Result.Data.Count(),    
+                ContactCount = _contactService.GetAll().Result.Data.Count()
             };
             return View(adminViewModelCounts);
         }
@@ -326,6 +329,39 @@ namespace OvgBlog.UI.Controllers
             }
             var deleteResult = await _articleService.Delete(id);            
             return Json(new JsonResultModel<Article>(deleteResult.Success, deleteResult.Message));
+        }
+        [HttpGet]
+        public async Task<IActionResult> ContactList()
+        {
+            var result = await _contactService.GetAll();
+            var list = result.Data.Adapt<List<ContactListViewModel>>();
+            return View(list);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return RedirectToAction("ContactList");
+            }
+            var result = await _contactService.Get(id);
+            if (result == null || result.Data == null || !result.Success)
+            {
+                return RedirectToAction("ContactList");
+            }
+            var model = result.Data.Adapt<ContactListViewModel>();
+            return View("ContactView", model);
+        }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteContact(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return Json(new JsonResultModel<ContactListViewModel>(false, "Id is not valid."));
+            }
+            await _contactService.Delete(id);
+            return Json(new JsonResultModel<ContactListViewModel>(true, "Kayıt silinmiştir."));
         }
     }
 }

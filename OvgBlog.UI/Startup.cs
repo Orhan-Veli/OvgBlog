@@ -40,14 +40,17 @@ namespace OvgBlog.UI
             services.AddSingleton<ICommentService, CommentService>();
             services.AddSingleton<ITagService, TagService>();
             services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IContactService, ContactService>();
 
             services.AddSingleton<IEntityRepository<User>, EntityRepository<User, OvgBlogContext>>();
             services.AddSingleton<IEntityRepository<Article>, EntityRepository<Article, OvgBlogContext>>();
             services.AddSingleton<IEntityRepository<Category>, EntityRepository<Category, OvgBlogContext>>();
             services.AddSingleton<IEntityRepository<Tag>, EntityRepository<Tag, OvgBlogContext>>();
             services.AddSingleton<IEntityRepository<Comment>, EntityRepository<Comment, OvgBlogContext>>();
+            services.AddSingleton<IEntityRepository<Contact>, EntityRepository<Contact, OvgBlogContext>>();
             services.AddSingleton<IEntityRepository<ArticleTagRelation>, EntityRepository<ArticleTagRelation, OvgBlogContext>>();
             services.AddSingleton<IEntityRepository<ArticleCategoryRelation>, EntityRepository<ArticleCategoryRelation, OvgBlogContext>>();
+            
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddMvc().AddFluentValidation();
@@ -61,6 +64,7 @@ namespace OvgBlog.UI
             services.AddTransient<IValidator<ArticleViewModel>, ArticleViewModelValidator>();
             services.AddTransient<IValidator<TagViewModel>, TagViewModelValidator>();
             services.AddTransient<IValidator<SendEmailViewModel>, SendEmailViewModelValidator>();
+            services.AddTransient<IValidator<ContactListViewModel>, ContactListViewModelValidator>();
           
 
             services.Configure<CookiePolicyOptions>(options =>

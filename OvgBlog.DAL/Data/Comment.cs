@@ -1,12 +1,11 @@
-﻿using OvgBlog.DAL.Abstract;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 #nullable disable
 
 namespace OvgBlog.DAL.Data
 {
-    public partial class Comment : IEntity
+    public partial class Comment
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

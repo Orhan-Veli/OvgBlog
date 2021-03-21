@@ -12,5 +12,7 @@ namespace OvgBlog.UI.Models
 
         public int TagCount { get; set; }
         public int CommentCount { get; set; }
+
+        public int ContactCount { get; set; }
     }
 }

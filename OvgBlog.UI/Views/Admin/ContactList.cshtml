@@ -1,0 +1,91 @@
+﻿@model List<ContactListViewModel>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header card-header-primary">
+            <h4 class="card-title ">Contact Table</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead class=" text-primary">
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>
+                        Body
+                    </th>
+                    <th>
+                        CreatedDate
+                    </th>
+                    <th>
+                        Look
+                    </th>
+                    <th>
+                        Delete
+                    </th>
+                    </thead>
+                    <tbody>
+                        @{
+                            int i = 1;
+                            foreach (var item in Model)
+                            {
+                                <tr id="row-@i">
+                                    <td>
+                                        @item.Name
+                                    </td>
+                                    <td>
+                                        @item.Email
+                                    </td>
+                                    <td>
+                                        @item.Body
+                                    </td>
+                                    <td>
+                                        @item.SendDate
+                                    </td>
+                                    <td><a asp-controller="Admin" asp-action="GetById" asp-route-Id="@item.Id" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a></td>
+                                    <form method="post">
+                                        <td><a href="javascript:;" onclick="DeleteArticle('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a></td>
+                                    </form>
+                                </tr>
+                                i++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script type="text/javascript">
+        function DeleteArticle(id, rowNumber) {
+            $.ajax({
+                url: '@Url.Action("DeleteContact", "Admin")',
+                method: 'DELETE',
+                data: { id },
+                success: function (result) {
+                    if (result == null) {
+                        toastr.error('İşlem gerçekleştirilirken hata oluştu.');
+                    } else if (!result.success) {
+                        toastr.error(result.message);
+                    } else {
+                        toastr.success(result.message);
+                        $('#row-' + rowNumber).remove();
+                    }
+                },
+                error: function (ex) {
+                    toastr.error('İşlem gerçekleştirilirken hata oluştu.');
+                }
+            });
+        }
+    </script>
+}
+
+

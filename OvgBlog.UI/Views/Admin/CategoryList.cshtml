@@ -136,13 +136,16 @@
                     url: '@Url.Action("AddCategory","Admin")',
                     data: { Name, SeoUrl, ImageUrl },
                     success: function (result) {
-                        if (result.success) {
+                        if (result.success)
+                        {
                             $('#myModal').modal('hide');
                             counter++;
                             $('#myTable > tbody:last-child').append('<tr><td>' + result.data.name + '</td><td>' + result.data.seoUrl + '</td><td>' + result.data.imageUrl + '</td>'
                                 + '<td> <a href="javascript:;" onclick="DeleteCategory(' + result.data.id + ',' + counter + ')" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a></td></tr>');
+                            location.reload();
                         }
-                        else {
+                        else
+                        {
                             toastr.error(result.message ?? 'sistemsel hata oluştu');
                         }
                     }

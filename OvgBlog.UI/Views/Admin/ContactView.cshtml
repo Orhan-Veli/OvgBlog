@@ -1,62 +1,47 @@
-﻿@model ArticleAddViewModel
+﻿@model ContactListViewModel
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 <div class="col-md-8">
     <div class="card">
         <div class="card-header card-header-primary">
-            <h4 class="card-title">Add Category</h4>
+            <h4 class="card-title">Update Article</h4>
         </div>
         <div class="card-body">
             <form method="post" enctype="multipart/form-data">
+                <input asp-for="Id" hidden />
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group bmd-form-group">
+                            <label class="bmd-label-floating">Name</label>
+                            <input type="text" asp-for="Name" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group bmd-form-group">
-                            <label class="bmd-label-floating">Seo Url</label>
-                            <input type="text" name="SeoUrl" class="form-control">
+                            <label class="bmd-label-floating">Email</label>
+                            <input type="text" asp-for="Email" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group bmd-form-group">
-                            <label class="bmd-label-floating">Title</label>
-                            <input type="text" name="Title" class="form-control">
+                            <label class="bmd-label-floating">Body</label>
+                            <textarea asp-for="Body" class="form-control" readonly></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group bmd-form-group">
-                            <label class="bmd-label-floating">Image</label>
-                            <input type="file" id="FileImageUrl" name="FileImageUrl" class="form-control">
+                            <label class="bmd-label-floating">Date</label>
+                            <input type="text" asp-for="SendDate" class="form-control" row="6" readonly/>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <label for="Category">Choose a Category:</label>
-                    <select id="CategoryId" name="CategoryId">
-                        @foreach (var item in Model.CategoryList)
-                        {
-                            <option value="@item.Id">@item.Name</option>
-                        }
-                    </select>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group bmd-form-group">
-                            <label class="bmd-label-floating">Tag Name</label>
-                            <input type="text" name="TagName" class="form-control">
-                        </div>
-                    </div>
-                </div>                
-                <div class="mb-3">
-                    <label for="exampleFormControlTextarea1" class="form-label">Article Body</label>
-                    <textarea class="form-control" name="Body" rows="3"></textarea>                   
-                </div>
-                <button type="submit" class="btn btn-primary pull-right">Add</button>
-                <div class="clearfix"></div>
-                <div asp-validation-summary="All" class="text-danger"></div>
+                </div>         
             </form>
         </div>
     </div>
@@ -104,4 +89,4 @@
 <script src="~/AddForm/assets/js/material-dashboard.js?v=2.1.2" type="text/javascript"></script>
 <!-- Material Dashboard DEMO methods, don't include it in your project! -->
 <script src="~/AddForm/assets/demo/demo.js"></script>
-<script>
+

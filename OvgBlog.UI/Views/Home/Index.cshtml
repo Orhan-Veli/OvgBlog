@@ -97,7 +97,7 @@
             <!-- blog-wrapper -->
             <div class="blog-card">
                 <div class="blog-card-header">
-                    <img src="~/uploads/@item.ImageUrl" class="blog-card-img" alt="@item.Title">
+                    <img src="~/uploads/@item.ImageUrl" style="max-width:50%;height:auto;" class="blog-card-img" alt="@item.Title">
                 </div>
                 <div class="blog-card-body">
                     <h5 class="blog-card-title">@item.Title</h5>
@@ -152,7 +152,7 @@
             $.ajax({
                 type: "post",
                 data: { name, email, body },
-                url: "@Url.Action("SendEmail", "Home")",
+                url: "@Url.Action("AddContact", "Home")",
                 success: function (result) {
                     if (!result.success) {
                        

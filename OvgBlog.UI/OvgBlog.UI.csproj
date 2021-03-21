@@ -7,9 +7,13 @@
 
   <ItemGroup>
     <Compile Remove="Filters\**" />
+    <Compile Remove="wwwroot\images\**" />
     <Content Remove="Filters\**" />
+    <Content Remove="wwwroot\images\**" />
     <EmbeddedResource Remove="Filters\**" />
+    <EmbeddedResource Remove="wwwroot\images\**" />
     <None Remove="Filters\**" />
+    <None Remove="wwwroot\images\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +23,6 @@
   <ItemGroup>
     <Folder Include="Views\Shared\" />
     <Folder Include="wwwroot\css\" />
-    <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\js\" />
     <Folder Include="wwwroot\lib\bootstrap\" />
     <Folder Include="wwwroot\lib\bootstrap\dist\css\" />
