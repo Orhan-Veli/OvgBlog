@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace OvgBlog.UI
 {
@@ -33,29 +34,33 @@ namespace OvgBlog.UI
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddControllersWithViews();
-            services.AddSingleton<IArticleService, ArticleService>();
-            services.AddSingleton<ICategoryService, CategoryService>();
-            services.AddSingleton<ICommentService, CommentService>();
-            services.AddSingleton<ITagService, TagService>();
-            services.AddSingleton<IUserService, UserService>();
-            services.AddSingleton<IContactService, ContactService>();
-
-            services.AddSingleton<IEntityRepository<User>, EntityRepository<User, OvgBlogContext>>();
-            services.AddSingleton<IEntityRepository<Article>, EntityRepository<Article, OvgBlogContext>>();
-            services.AddSingleton<IEntityRepository<Category>, EntityRepository<Category, OvgBlogContext>>();
-            services.AddSingleton<IEntityRepository<Tag>, EntityRepository<Tag, OvgBlogContext>>();
-            services.AddSingleton<IEntityRepository<Comment>, EntityRepository<Comment, OvgBlogContext>>();
-            services.AddSingleton<IEntityRepository<Contact>, EntityRepository<Contact, OvgBlogContext>>();
-            services.AddSingleton<IEntityRepository<ArticleTagRelation>, EntityRepository<ArticleTagRelation, OvgBlogContext>>();
-            services.AddSingleton<IEntityRepository<ArticleCategoryRelation>, EntityRepository<ArticleCategoryRelation, OvgBlogContext>>();
-            
+        {          
+ 
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddMvc().AddFluentValidation();
 
+            services.AddScoped<IEntityRepository<User>, EntityRepository<User>>();
+            services.AddScoped<IEntityRepository<Article>, EntityRepository<Article>>();
+            services.AddScoped<IEntityRepository<Category>, EntityRepository<Category>>();
+            services.AddScoped<IEntityRepository<Tag>, EntityRepository<Tag>>();
+            services.AddScoped<IEntityRepository<Comment>, EntityRepository<Comment>>();
+            services.AddScoped<IEntityRepository<Contact>, EntityRepository<Contact>>();
+            services.AddScoped<IEntityRepository<ArticleTagRelation>, EntityRepository<ArticleTagRelation>>();
+            services.AddScoped<IEntityRepository<ArticleCategoryRelation>, EntityRepository<ArticleCategoryRelation>>();
 
+            services.AddScoped<IArticleService, ArticleService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<ITagService, TagService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IContactService, ContactService>();
+
+#if DEBUG
+            services.AddDbContextPool<OvgBlogContext>(x => x.UseSqlServer(Configuration["ConnectionString:Dev"]?.ToString()));
+#else
+            services.AddDbContextPool<OvgBlogContext>(x => x.UseSqlServer(Configuration["ConnectionString:Prod"]?.ToString()));
+#endif
             services.AddTransient<IValidator<ArticleDetailViewModel>, ArticleDetailViewModelValidator>();
             services.AddTransient<IValidator<ArticleListViewModel>, ArticleListViewModelValidator>();
             services.AddTransient<IValidator<CategoryListViewModel>, CategoryListViewModelValidator>();
@@ -69,21 +74,16 @@ namespace OvgBlog.UI
 
             services.Configure<CookiePolicyOptions>(options =>
             {
-
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
-
             });
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
                 options.Cookie.Name = "AUTHCOOKIE";
                 options.LoginPath = "/Login";
-
             });
-
             services.AddRazorPages();
-
         }
 
 
