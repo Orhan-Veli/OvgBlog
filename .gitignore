@@ -532,4 +532,4 @@ MigrationBackup/
 
 # End of https://www.toptal.com/developers/gitignore/api/vs,vscode,visualstudio,visualstudiocode
 
-OvgBlog.UI/appsettings.Production.json
+./OvgBlog.UI/appsettings.Production.json
