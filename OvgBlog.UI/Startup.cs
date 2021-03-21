@@ -56,11 +56,10 @@ namespace OvgBlog.UI
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IContactService, ContactService>();
 
-#if DEBUG
-            services.AddDbContextPool<OvgBlogContext>(x => x.UseSqlServer(Configuration["ConnectionString:Dev"]?.ToString()));
-#else
-            services.AddDbContextPool<OvgBlogContext>(x => x.UseSqlServer(Configuration["ConnectionString:Prod"]?.ToString()));
-#endif
+
+            services.AddDbContextPool<OvgBlogContext>(x => x.UseSqlServer(Configuration["ConnectionStrings"].ToString()));           
+            
+
             services.AddTransient<IValidator<ArticleDetailViewModel>, ArticleDetailViewModelValidator>();
             services.AddTransient<IValidator<ArticleListViewModel>, ArticleListViewModelValidator>();
             services.AddTransient<IValidator<CategoryListViewModel>, CategoryListViewModelValidator>();
@@ -89,7 +88,7 @@ namespace OvgBlog.UI
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {            
+        {       app.UseDeveloperExceptionPage();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
