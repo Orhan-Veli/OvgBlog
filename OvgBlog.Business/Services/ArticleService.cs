@@ -27,6 +27,7 @@ namespace OvgBlog.Business.Services
         }
         public async Task<IResult<Article>> Create(Article article)
         {
+            List<ArticleTagRelation> tempArticleRelation = new List<ArticleTagRelation>();
             if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl))
             {
                 return new Result<Article>(false, Message.ModelNotValid);
@@ -39,20 +40,25 @@ namespace OvgBlog.Business.Services
             }
             article.Id = Guid.NewGuid();
             article.CreatedDate = DateTime.Now;
-            await _articleRepository.Create(article); 
+            await _articleRepository.Create(article);
             
             foreach (var item in article.ArticleTagRelations)
+            {
+                tempArticleRelation.Add(item);
+            }
+            foreach (var item in tempArticleRelation)
             {
                 var tagmodel = new ArticleTagRelation
                 {
                     Id = Guid.NewGuid(),
                     TagId = item.TagId,
-                    ArticleId = article.Id,                       
-                    CreatedDate = DateTime.Now
+                    ArticleId = article.Id,
+                    CreatedDate = DateTime.Now,
+                    IsActive = true
                 };
-
                 await _tagRelationRepository.Create(tagmodel);
             }
+            tempArticleRelation.Clear();
             await _categoryRelationRepository.Create(new ArticleCategoryRelation { Id = Guid.NewGuid(), ArticleId = article.Id, CategoryId = article.ArticleCategoryRelations.FirstOrDefault().CategoryId, CreatedDate = DateTime.Now });
 
             return new Result<Article>(true, article);

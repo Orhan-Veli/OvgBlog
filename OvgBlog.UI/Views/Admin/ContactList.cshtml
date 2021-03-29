@@ -68,7 +68,7 @@
         function DeleteArticle(id, rowNumber) {
             $.ajax({
                 url: '@Url.Action("DeleteContact", "Admin")',
-                method: 'DELETE',
+                method: 'DELETE',                
                 data: { id },
                 success: function (result) {
                     if (result == null) {

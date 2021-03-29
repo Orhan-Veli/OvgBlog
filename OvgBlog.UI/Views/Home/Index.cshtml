@@ -107,7 +107,7 @@
                         <a href="javascript:;"><i class="fa fa-calendar-o"></i> Tarih: @item.CreatedDate?.ToString("dd.MM.yyyy")</a>
                     </p>
 
-                    <p>@item.Body</p>
+                    <p>@Html.Raw(item.Body)</p>
 
                     <a asp-controller="Article" asp-action="Index" asp-route-seoUrl="@item.SeoUrl" class="blog-card-link">Devamını oku <i class="ti-angle-double-right"></i></a>
                 </div>

@@ -19,8 +19,6 @@ namespace OvgBlog.UI.Models
         public IFormFile FileImageUrl { get; set; }
         public string ImageUrl { get; set; }
         public string TagName { get; set; }
-       
-
         public Guid CategoryId { get; set; }
 
         public List<CategoryListViewModel> CategoryList { get; set; }

@@ -45,7 +45,7 @@
                         <h2 class="display-4">
                             <a asp-controller="Article" asp-action="Index" asp-route-seoUrl="@item.SeoUrl">@item.Title</a>
                         </h2>
-                        <p>@item.Body</p>
+                        <p>@Html.Raw(item.Body)</p>
                     </div>
                 </div>
             </div>
