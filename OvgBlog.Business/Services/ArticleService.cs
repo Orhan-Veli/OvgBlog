@@ -147,7 +147,7 @@ namespace OvgBlog.Business.Services
         }
         public async Task<IResult<Article>> Update(Article article)
         {
-            if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl) || article.UserId == Guid.Empty || article.Id == Guid.Empty)
+            if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl))
             {
                 return new Result<Article>(false, Message.ModelNotValid);
             }

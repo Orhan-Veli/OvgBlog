@@ -269,7 +269,9 @@ namespace OvgBlog.UI.Controllers
             result.Data.ArticleCategoryRelations.Add(new ArticleCategoryRelation
             {
                 CategoryId = articleUpdateViewModel.SelectedCategoryId,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.Now,
+                Id = Guid.NewGuid(),
+                ArticleId = result.Data.Id
             });
             await _articleService.Update(result.Data);
             return RedirectToAction("ArticleList");
