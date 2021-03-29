@@ -12,7 +12,7 @@ namespace OvgBlog.UI.Extentions
     {
         public static string ReplaceSeoUrl(this string seoUrl)
         {
-           return string.Join("",seoUrl.Normalize(NormalizationForm.FormD).Where(c => char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)).ToLower().Replace(" ","-");
+           return string.Join("",seoUrl.Normalize(NormalizationForm.FormD).Where(c => char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)).ToLower().Replace(" ","-").Replace("ı","i");
         }
         public static bool EmailValidation(this string email)
         {           

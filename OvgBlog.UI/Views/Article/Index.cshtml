@@ -23,7 +23,7 @@
             <a href="javascript:;"><i class="fa fa-user-circle-o"></i> Category: Admin</a>
             <a href="javascript:;"><i class="fa fa-calendar-o"></i> Tarih: @Model.CreatedDate.ToString("dd.MM.yyyy")</a>
         </p>
-        <img src="~/uploads/@Model.ImageUrl" style="width: 50%; height:50%" /><br><br>
+        <img src="~/uploads/@Model.ImageUrl" /><br><br>
         <p>
             @Html.Raw(Model.Body)
         </p><br />

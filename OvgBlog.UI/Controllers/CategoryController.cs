@@ -56,10 +56,16 @@ namespace OvgBlog.UI.Controllers
             }
             var map = articleResult.Data.OrderByDescending(x=> x.CreatedDate).Adapt<List<ArticleListViewModel>>();
             if (map.Count!=0)
-            {
-                map.FirstOrDefault().CategorySeoUrl = seoUrl;
-            }
-           
+            {               
+                foreach (var item in map)
+                {
+                    if (item.Body?.Length>100)
+                    {
+                        item.Body = (item.Body?.Substring(0, 100)?.ToString() ?? "") + " ...";
+                    }
+                    item.CategorySeoUrl = seoUrl;
+                }              
+            }           
             return View(map);
         }
     }

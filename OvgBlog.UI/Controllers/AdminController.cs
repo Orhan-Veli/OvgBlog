@@ -57,8 +57,8 @@ namespace OvgBlog.UI.Controllers
                 ArticleCount = _articleService.GetAll().Result.Data.Count(),
                 CategoryCount = _categoryService.GetAll().Result.Data.Count(),
                 TagCount = _tagService.GetAll().Result.Data.Count(),
-                CommentCount = _commentService.GetAll().Result.Data.Count(),    
-                ContactCount = _contactService.GetAll().Result.Data.Count()
+                CommentCount =  _commentService.GetAll().Result.Data.Count(),    
+                ContactCount =  _contactService.GetAll().Result.Data.Count()
             };
             return View(adminViewModelCounts);
         }
@@ -143,16 +143,13 @@ namespace OvgBlog.UI.Controllers
             {
                 return View(model);
             }
-
             string wwwRootPath = _webHostEnvironment.WebRootPath;
             string fileName = Path.GetFileNameWithoutExtension(model.FileImageUrl.FileName);
             string extension = Path.GetExtension(model.FileImageUrl.FileName);
             string path = Path.Combine(wwwRootPath+"/uploads/",fileName + extension);
             using (var fileStream = new FileStream(path, FileMode.Create))
             {
-
                 await model.FileImageUrl.CopyToAsync(fileStream);
-
             }
             model.ImageUrl = model.FileImageUrl.FileName;
             model.SeoUrl = model.SeoUrl.ReplaceSeoUrl();

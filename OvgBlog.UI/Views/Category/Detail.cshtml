@@ -45,7 +45,7 @@
                         <h2 class="display-4">
                             <a asp-controller="Article" asp-action="Index" asp-route-seoUrl="@item.SeoUrl">@item.Title</a>
                         </h2>
-                        <p>@Html.Raw(item.Body)</p>
+                        <p>@Html.Raw(item.Body) <a asp-controller="Article" asp-action="Index" asp-route-seoUrl="@item.SeoUrl" class="blog-card-link">Devamını oku <i class="ti-angle-double-right"></i></a></p>
                     </div>
                 </div>
             </div>
