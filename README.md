@@ -63,17 +63,17 @@
 * Mapster 7.1
 * Fluent Validation 9.5
 * Mssql 18
-*Mailkit
-*Toastr
-*Mailkit
+* Mailkit
+* Toastr
+* Mailkit
 
 
 ## Links
 * [DataFirst](https://www.entityframeworktutorial.net/Data-first/what-is-code-first.aspx)
 * [Mapster](https://www.nuget.org/packages/Mapster/)
 * [Fluent Validation](https://docs.fluentvalidation.net/en/latest/aspnet.html)
-*[Toastr](https://github.com/CodeSeven/toastr)
-*[Mailkit](https://github.com/jstedfast/MailKit)
+* [Toastr](https://github.com/CodeSeven/toastr)
+* [Mailkit](https://github.com/jstedfast/MailKit)
 
 ## Setup
 * Download the repository.
