@@ -50,7 +50,6 @@
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/ArticlePage.PNG" width="600" />
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/CategoryPage.PNG" width="600" />
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/CommentTable.PNG" width="600" />
-<img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/Update.PNG" width="600" />
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/ContactTable.PNG" width="600" />
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/TagPage.PNG" width="600" />
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/Database.PNG" width="600" />
