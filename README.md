@@ -65,6 +65,7 @@
 * Mailkit
 * Toastr
 * Mailkit
+* Summernote
 
 
 ## Links
@@ -73,6 +74,7 @@
 * [Fluent Validation](https://docs.fluentvalidation.net/en/latest/aspnet.html)
 * [Toastr](https://github.com/CodeSeven/toastr)
 * [Mailkit](https://github.com/jstedfast/MailKit)
+* [Summernote](https://summernote.org)
 
 ## Setup
 * Download the repository.
