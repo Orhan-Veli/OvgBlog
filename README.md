@@ -1,5 +1,5 @@
 # OvgBlog
-> With this project you can make your blog with Mssql server.
+> With this project you can make your blog with ASP.NET Core.
 
 ## Table of contents
 * [General info](#general-info)
