@@ -28,7 +28,7 @@ namespace OvgBlog.UI.Controllers
         [HttpGet("article/{seoUrl}")]
         public async Task<IActionResult> Index(string seoUrl)
         
-        {
+         {
             if (string.IsNullOrEmpty(seoUrl))
             {
                 return RedirectToAction("Index", "Home");
@@ -59,7 +59,10 @@ namespace OvgBlog.UI.Controllers
                 var model = response.Data.Adapt<ArticleDetailViewModel>();                
                 foreach (var item in tagListResponse.Data)
                 {
-                    model.Tags.Add(item.ArticleTagRelations.Where(x=> !x.IsDeleted).Adapt<TagViewModel>());
+                   if(item.ArticleTagRelations.Where(x => !x.Tag.IsDeleted).Any())
+                    {
+                        model.Tags.Add(item.Adapt<TagViewModel>());
+                    }                   
                 }
                 var userResponse = await _userService.GetById(response.Data.UserId);
                 if (userResponse.Success)
@@ -70,5 +73,6 @@ namespace OvgBlog.UI.Controllers
             }
 
         }
+        
     }
 }
