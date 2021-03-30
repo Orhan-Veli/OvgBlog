@@ -50,7 +50,6 @@
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/ArticlePage.PNG" width="600" />
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/CategoryPage.PNG" width="600" />
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/CommentTable.PNG" width="600" />
-<img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/Update.PNG" width="600" />
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/ContactTable.PNG" width="600" />
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/TagPage.PNG" width="600" />
 <img src="https://github.com/Orhan-Veli/OvgBlog/blob/master/Img/Database.PNG" width="600" />
@@ -63,17 +62,19 @@
 * Mapster 7.1
 * Fluent Validation 9.5
 * Mssql 18
-*Mailkit
-*Toastr
-*Mailkit
+* Mailkit
+* Toastr
+* Mailkit
+* Summernote
 
 
 ## Links
 * [DataFirst](https://www.entityframeworktutorial.net/Data-first/what-is-code-first.aspx)
 * [Mapster](https://www.nuget.org/packages/Mapster/)
 * [Fluent Validation](https://docs.fluentvalidation.net/en/latest/aspnet.html)
-*[Toastr](https://github.com/CodeSeven/toastr)
-*[Mailkit](https://github.com/jstedfast/MailKit)
+* [Toastr](https://github.com/CodeSeven/toastr)
+* [Mailkit](https://github.com/jstedfast/MailKit)
+* [Summernote](https://summernote.org)
 
 ## Setup
 * Download the repository.
