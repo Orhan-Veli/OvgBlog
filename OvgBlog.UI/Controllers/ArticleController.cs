@@ -35,17 +35,17 @@ namespace OvgBlog.UI.Controllers
             }
 
             var response = await _articleService.GetBySeoUrl(seoUrl);           
-            if (!response.Success)
+            if (!response.IsSuccess)
             {
                 return RedirectToAction("Index", "Home");
             }
             response.Data.Comments = response.Data.Comments.Where(x => !x.IsDeleted).ToList();
             var articleTags = await _tagService.GetAll();
-            if (articleTags.Data == null || !articleTags.Success || response.Data.ArticleTagRelations.Count == 0)
+            if (articleTags.Data == null || !articleTags.IsSuccess || response.Data.ArticleTagRelations.Count == 0)
             {
                 var model = response.Data.Adapt<ArticleDetailViewModel>();               
                 var userResponse = await _userService.GetById(response.Data.UserId);
-                if (userResponse.Success)
+                if (userResponse.IsSuccess)
                 {
                     model.UserName = userResponse.Data.Name;
                 }               
@@ -65,7 +65,7 @@ namespace OvgBlog.UI.Controllers
                     }                   
                 }
                 var userResponse = await _userService.GetById(response.Data.UserId);
-                if (userResponse.Success)
+                if (userResponse.IsSuccess)
                 {
                     model.UserName = userResponse.Data.Name;
                 }

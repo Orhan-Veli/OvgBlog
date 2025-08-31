@@ -87,13 +87,13 @@ namespace OvgBlog.UI.Controllers
             }
             categoryAddViewModel.SeoUrl = categoryAddViewModel.SeoUrl.ReplaceSeoUrl();
             var result = await _categoryService.CategoryBySeoUrl(categoryAddViewModel.SeoUrl);
-            if (result.Success)
+            if (result.IsSuccess)
             {
                 return Json(new JsonResultModel<Category>(false, "SeoUrl zaten bulunuyor."));
             }
             var category = categoryAddViewModel.Adapt<Category>();
             var createResult = await _categoryService.Create(category);
-            if (!createResult.Success || createResult.Data == null)
+            if (!createResult.IsSuccess || createResult.Data == null)
             {
                 return Json(new JsonResultModel<Category>(false, "Kayıt Eklenemedi"));
             }
@@ -123,7 +123,7 @@ namespace OvgBlog.UI.Controllers
                 return Json(new JsonResultModel<Category>(false, "Geçersiz kategori id"));
             }
             var deleteResult = await _categoryService.Delete(id);
-            return Json(new JsonResultModel<Category>(deleteResult.Success, deleteResult.Message));
+            return Json(new JsonResultModel<Category>(deleteResult.IsSuccess, deleteResult.Message));
         }
         [HttpGet]
         public async Task<IActionResult> AddArticle()
@@ -154,7 +154,7 @@ namespace OvgBlog.UI.Controllers
             model.ImageUrl = model.FileImageUrl.FileName;
             model.SeoUrl = model.SeoUrl.ReplaceSeoUrl();
             var result = await _articleService.GetBySeoUrl(model.SeoUrl);
-            if (result.Success && result.Data != null)
+            if (result.IsSuccess && result.Data != null)
             {
                 ModelState.AddModelError("SeoUrl", "SeoUrl is already taken");
                 return View(model);
@@ -162,7 +162,7 @@ namespace OvgBlog.UI.Controllers
 
             var tags = model.TagName.Split(",");
             var article = model.Adapt<Article>();
-            for (int i = 0; i < tags.Length; i++)
+            for (var i = 0; i < tags.Length; i++)
             {
                 var tagRelation = new ArticleTagRelation
                 {
@@ -292,7 +292,7 @@ namespace OvgBlog.UI.Controllers
                 return Json(new JsonResultModel<Tag>(false, "Geçersiz tag id"));
             }
             var deleteResult = await _tagService.Delete(id);
-            return Json(new JsonResultModel<Tag>(deleteResult.Success, deleteResult.Message));
+            return Json(new JsonResultModel<Tag>(deleteResult.IsSuccess, deleteResult.Message));
         }
         [HttpGet]
         public async Task<IActionResult> CommentList()
@@ -310,7 +310,7 @@ namespace OvgBlog.UI.Controllers
                 return Json(new JsonResultModel<Comment>(false, "Geçersiz article id"));
             }
             var deleteResult = await _commentService.Delete(id);
-            return Json(new JsonResultModel<Comment>(deleteResult.Success, deleteResult.Message));
+            return Json(new JsonResultModel<Comment>(deleteResult.IsSuccess, deleteResult.Message));
         }
 
         [HttpDelete]
@@ -327,7 +327,7 @@ namespace OvgBlog.UI.Controllers
                 System.IO.File.Delete(imagePath);
             }
             var deleteResult = await _articleService.Delete(id);            
-            return Json(new JsonResultModel<Article>(deleteResult.Success, deleteResult.Message));
+            return Json(new JsonResultModel<Article>(deleteResult.IsSuccess, deleteResult.Message));
         }
         [HttpGet]
         public async Task<IActionResult> ContactList()
@@ -345,7 +345,7 @@ namespace OvgBlog.UI.Controllers
                 return RedirectToAction("ContactList");
             }
             var result = await _contactService.Get(id);
-            if (result == null || result.Data == null || !result.Success)
+            if (result == null || result.Data == null || !result.IsSuccess)
             {
                 return RedirectToAction("ContactList");
             }

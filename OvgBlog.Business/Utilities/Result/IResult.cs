@@ -6,7 +6,7 @@ namespace OvgBlog.Business.Constants
 {
     public interface IResult<T>
     {
-        public bool Success { get; }
+        public bool IsSuccess { get; }
 
         public string Message { get; }
 

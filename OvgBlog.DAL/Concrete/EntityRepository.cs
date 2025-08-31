@@ -4,78 +4,77 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
+using OvgBlog.DAL.Data.Base;
 
 namespace OvgBlog.DAL.Concrete
 {
-    public class EntityRepository<TEntity> : IEntityRepository<TEntity> where TEntity : class, new()
+    public class EntityRepository<TEntity>(OvgBlogContext context) : IEntityRepository<TEntity>
+        where TEntity : BaseEntity, new()
 
     {
-        private readonly OvgBlogContext _context;
-        public EntityRepository(OvgBlogContext context)
+        public async Task Create(TEntity entity, CancellationToken cancellationToken)
         {
-            _context = context;
-        }
-        public async Task Create(TEntity entity)
-        {
-            var addedEntity = _context.Entry(entity);
+            var addedEntity = context.Entry(entity);
             addedEntity.State = EntityState.Added;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
         }
-        public async Task Delete(Guid id)
+        
+        public async Task Delete(Guid id, CancellationToken cancellationToken)
         {
-            var deletedEntity = _context.Entry(id);
+            var deletedEntity = context.Entry(id);
             deletedEntity.State = EntityState.Deleted;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAll(Expression<Func<TEntity, bool>> filter = null, Expression<Func<TEntity, object>> includeFilter = null)
+        public async Task<IEnumerable<TEntity>> GetAll(CancellationToken cancellationToken, Expression<Func<TEntity, bool>> filter = null, Expression<Func<TEntity, object>> includeFilter = null)
         {
             IEnumerable<TEntity> result = null;
 
             if (filter == null)
             {
                 result = includeFilter == null
-                    ? await _context.Set<TEntity>().ToListAsync()
-                    : await _context.Set<TEntity>().Include(includeFilter).ToListAsync();
+                    ? await context.Set<TEntity>().ToListAsync(cancellationToken)
+                    : await context.Set<TEntity>().Include(includeFilter).ToListAsync(cancellationToken);
             }
             else
             {
                 result = includeFilter == null
-                    ? await _context.Set<TEntity>().Where(filter).ToListAsync()
-                    : await _context.Set<TEntity>().Where(filter).Include(includeFilter).ToListAsync();
+                    ? await context.Set<TEntity>().Where(filter).ToListAsync(cancellationToken)
+                    : await context.Set<TEntity>().Where(filter).Include(includeFilter).ToListAsync(cancellationToken);
             }
             return result;
         }
 
-        public async Task<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeFilters = null)
+        public async Task<TEntity> Get(CancellationToken cancellationToken, Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeFilters = null)
         {
 
             if (includeFilters == null || includeFilters.Count == 0)
             {
                 return filter == null
-                    ? await _context.Set<TEntity>().SingleOrDefaultAsync()
-                    : await _context.Set<TEntity>().SingleOrDefaultAsync(filter);
+                    ? await context.Set<TEntity>().SingleOrDefaultAsync(cancellationToken)
+                    : await context.Set<TEntity>().SingleOrDefaultAsync(filter, cancellationToken);
             }
             else
             {
-                var query = _context.Set<TEntity>().AsQueryable();
+                var query = context.Set<TEntity>().AsQueryable();
                 foreach (var item in includeFilters)
                 {
                     query = query.Include(item);
                 }
                 return filter == null
-                    ? await query.SingleOrDefaultAsync()
-                    : await query.SingleOrDefaultAsync(filter);
+                    ? await query.SingleOrDefaultAsync(cancellationToken)
+                    : await query.SingleOrDefaultAsync(filter, cancellationToken);
             }
 
         }
 
-        public async Task<TEntity> Update(TEntity model)
+        public async Task<TEntity> Update(TEntity model, CancellationToken cancellationToken)
         {
-            var updatedEntity = _context.Entry(model);
+            var updatedEntity = context.Entry(model);
             updatedEntity.State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
             return updatedEntity.Entity;
         }
     }

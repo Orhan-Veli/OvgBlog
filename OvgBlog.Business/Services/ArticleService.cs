@@ -7,111 +7,105 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OvgBlog.Business.Services
 {
-    public class ArticleService : IArticleService
+    public class ArticleService(
+        IEntityRepository<Article> articleRepository,
+        IEntityRepository<User> userRepository,
+        IEntityRepository<ArticleTagRelation> tagRelationRepository,
+        IEntityRepository<ArticleCategoryRelation> categoryRelationRepository)
+        : IArticleService
     {
-        readonly IEntityRepository<Article> _articleRepository;
-        readonly IEntityRepository<User> _userRepository;
-        readonly IEntityRepository<ArticleTagRelation> _tagRelationRepository;
-        readonly IEntityRepository<ArticleCategoryRelation> _categoryRelationRepository;
-        public ArticleService(IEntityRepository<Article> articleRepository, IEntityRepository<User> userRepository,
-            IEntityRepository<ArticleTagRelation> tagRelationRepository, IEntityRepository<ArticleCategoryRelation> categoryRelationRepository)
-        {
-            _articleRepository = articleRepository;
-            _userRepository = userRepository;
-            _tagRelationRepository = tagRelationRepository;
-            _categoryRelationRepository = categoryRelationRepository;
-        }
-        public async Task<IResult<Article>> Create(Article article)
+        public async Task<IResult<Article>> Create(Article article, CancellationToken cancellationToken)
         {
             List<ArticleTagRelation> tempArticleRelation = new List<ArticleTagRelation>();
             if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl))
             {
                 return new Result<Article>(false, Message.ModelNotValid);
             }
-            article.UserId = (await _userRepository.Get()).Id;
-            var userEntity = await _userRepository.Get(x => x.Id == article.UserId && !x.IsDeleted);
+            article.UserId = (await userRepository.Get(cancellationToken)).Id;
+            var userEntity = await userRepository.Get(cancellationToken, x => x.Id == article.UserId && !x.IsDeleted);
             if (userEntity == null)
             {
                 return new Result<Article>(false, Message.UserNotFound);
             }
             article.Id = Guid.NewGuid();
             article.CreatedDate = DateTime.Now;
-            await _articleRepository.Create(article);
+            await articleRepository.Create(article, cancellationToken);
             
             foreach (var item in article.ArticleTagRelations)
             {
                 tempArticleRelation.Add(item);
             }
-            foreach (var item in tempArticleRelation)
+            foreach (var tagmodel in tempArticleRelation.Select(item => new ArticleTagRelation
+                     {
+                         Id = Guid.NewGuid(),
+                         TagId = item.TagId,
+                         ArticleId = article.Id,
+                         CreatedDate = DateTime.Now,
+                         IsActive = true
+                     }))
             {
-                var tagmodel = new ArticleTagRelation
-                {
-                    Id = Guid.NewGuid(),
-                    TagId = item.TagId,
-                    ArticleId = article.Id,
-                    CreatedDate = DateTime.Now,
-                    IsActive = true
-                };
-                await _tagRelationRepository.Create(tagmodel);
+                await tagRelationRepository.Create(tagmodel, cancellationToken);
             }
             tempArticleRelation.Clear();
-            await _categoryRelationRepository.Create(new ArticleCategoryRelation { Id = Guid.NewGuid(), ArticleId = article.Id, CategoryId = article.ArticleCategoryRelations.FirstOrDefault().CategoryId, CreatedDate = DateTime.Now });
+            await categoryRelationRepository.Create(new ArticleCategoryRelation { Id = Guid.NewGuid(), ArticleId = article.Id, CategoryId = article.ArticleCategoryRelations.FirstOrDefault().CategoryId, CreatedDate = DateTime.Now }, cancellationToken);
 
             return new Result<Article>(true, article);
         }
 
-        public async Task<IResult<object>> Delete(Guid id)
+        public async Task<IResult<object>> Delete(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
                 return new Result<object>(false, Message.IdIsNotValid);
             }
-            var articleEntity = await _articleRepository.Get(x => x.Id == id && !x.IsDeleted);
+            var articleEntity = await articleRepository.Get(cancellationToken, x => x.Id == id && !x.IsDeleted);
             if (articleEntity == null)
             {
                 return new Result<object>(false, Message.ArticleIsNotFound);
             }
-            var tagRelationEntities = await _tagRelationRepository.GetAll(x => x.ArticleId == articleEntity.Id && !x.IsDeleted);
+            var tagRelationEntities = await tagRelationRepository.GetAll(cancellationToken, x => x.ArticleId == articleEntity.Id && !x.IsDeleted);
             foreach (var item in tagRelationEntities)
             {
                 item.IsDeleted = true;
                 item.DeletedDate = DateTime.Now;
-                await _tagRelationRepository.Update(item);
+                await tagRelationRepository.Update(item, cancellationToken);
             }
-            var categoryEntities = await _categoryRelationRepository.GetAll(x => x.ArticleId == articleEntity.Id && !x.IsDeleted);
+            var categoryEntities = await categoryRelationRepository.GetAll(cancellationToken, x => x.ArticleId == articleEntity.Id && !x.IsDeleted);
             foreach (var item in categoryEntities)
             {
                 item.IsDeleted = true;
                 item.DeletedDate = DateTime.Now;
-                await _categoryRelationRepository.Update(item);
+                await categoryRelationRepository.Update(item, cancellationToken);
             }
             articleEntity.IsDeleted = true;
             articleEntity.DeletedDate = DateTime.Now;
-            await _articleRepository.Update(articleEntity);
+            await articleRepository.Update(articleEntity, cancellationToken);
             return new Result<object>(true);
         }
 
-        public async Task<IResult<IEnumerable<Article>>> GetAll()
+        public async Task<IResult<IEnumerable<Article>>> GetAll(CancellationToken cancellationToken)
         {
-            var list = await _articleRepository.GetAll(x => !x.IsDeleted, x => x.User);
+            var list = await articleRepository.GetAll(cancellationToken, x => !x.IsDeleted, x => x.User);
             return new Result<IEnumerable<Article>>(true, list);
         }
 
-        public async Task<IResult<IEnumerable<Article>>> GetByCategoryId(Guid categoryId)
+        public async Task<IResult<IEnumerable<Article>>> GetByCategoryId(Guid categoryId, CancellationToken cancellationToken)
         {
             if (categoryId == Guid.Empty)
             {
                 return new Result<IEnumerable<Article>>(false, Message.IdIsNotValid);
             }
-            var result = await _articleRepository.GetAll(x => x.ArticleCategoryRelations.Any(c => c.CategoryId == categoryId));
+            
+            var result = await articleRepository.GetAll(cancellationToken, x => x.ArticleCategoryRelations.Any(c => c.CategoryId == categoryId));
             return new Result<IEnumerable<Article>>(true, result);
         }
 
-        public async Task<IResult<Article>> GetById(Guid id)
+        public async Task<IResult<Article>> GetById(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
@@ -120,7 +114,7 @@ namespace OvgBlog.Business.Services
             var expressions = new List<Expression<Func<Article, object>>>();
             expressions.Add(x => x.Comments);
             expressions.Add(x => x.ArticleCategoryRelations);
-            var articleEntity = await _articleRepository.Get((x => x.Id == id && !x.IsDeleted), expressions);
+            var articleEntity = await articleRepository.Get(cancellationToken, x => x.Id == id && !x.IsDeleted, expressions);
             if (articleEntity == null)
             {
                 return new Result<Article>(false, Message.ArticleIsNotFound);
@@ -128,7 +122,7 @@ namespace OvgBlog.Business.Services
             return new Result<Article>(true, articleEntity);
         }
 
-        public async Task<IResult<Article>> GetBySeoUrl(string seoUrl)
+        public async Task<IResult<Article>> GetBySeoUrl(string seoUrl, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(seoUrl))
             {
@@ -138,31 +132,31 @@ namespace OvgBlog.Business.Services
             expressions.Add(x => x.Comments);
             expressions.Add(x => x.ArticleCategoryRelations);
             expressions.Add(x => x.ArticleTagRelations);          
-            var articleEntity = await _articleRepository.Get((x => x.SeoUrl == seoUrl && !x.IsDeleted), expressions);
+            var articleEntity = await articleRepository.Get(cancellationToken, x => x.SeoUrl == seoUrl && !x.IsDeleted, expressions);
             if (articleEntity == null)
             {
                 return new Result<Article>(false, Message.ArticleIsNotFound);
             }            
             return new Result<Article>(true, articleEntity);
         }
-        public async Task<IResult<Article>> Update(Article article)
+        public async Task<IResult<Article>> Update(Article article, CancellationToken cancellationToken)
         {
             if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl))
             {
                 return new Result<Article>(false, Message.ModelNotValid);
             }
-            var articleEntity = await _articleRepository.Get(x => x.Id == article.Id && !x.IsDeleted);
+            var articleEntity = await articleRepository.Get(cancellationToken, x => x.Id == article.Id && !x.IsDeleted);
             if (articleEntity == null)
             {
                 return new Result<Article>(false, Message.ArticleIsNotFound);
             }
-            var userEntity = await _userRepository.Get(x => x.Id == article.UserId && !x.IsDeleted);
+            var userEntity = await userRepository.Get(cancellationToken, x => x.Id == article.UserId && !x.IsDeleted);
             if (userEntity == null)
             {
                 return new Result<Article>(false, Message.UserNotFound);
             }
             article.UpdatedDate = DateTime.Now;
-            articleEntity = await _articleRepository.Update(article);
+            articleEntity = await articleRepository.Update(article, cancellationToken);
             return new Result<Article>(true, articleEntity);
         }
     }

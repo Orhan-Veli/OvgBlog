@@ -42,24 +42,7 @@ namespace OvgBlog.UI.Controllers
         {          
             var model = new HomeViewModel();
 
-            var articleList = new List<ArticleListViewModel>();
-            var response = await _articleService.GetAll();
-            if (response.Success)
-            {
-                articleList = response.Data.Adapt<List<ArticleListViewModel>>();
-                articleList.ForEach(item => item.Body = item.Body?.Length > 100
-                                    ? (item.Body?.Substring(0, 100)?.ToString() ?? "") + " ..."
-                                    : item.Body);
-            }
-            model.Articles = articleList.OrderByDescending(x=> x.CreatedDate).Take(3).ToList();
-            var categoryList = new List<CategoryListViewModel>();
-            var categoryResult = await _categoryService.GetAll();
-            if (categoryResult.Success && categoryResult.Data != null)
-            {
-                categoryList = categoryResult.Data.Adapt<List<CategoryListViewModel>>();
-                categoryList.Where(x => x.ImageUrl == null).ToList().ForEach(item => item.ImageUrl = "uploads/DefaultCategory.png");
-            }
-            model.Categories = categoryList;
+           
 
             return View(model);
         }
