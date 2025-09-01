@@ -25,7 +25,7 @@ namespace OvgBlog.UI.Controllers
         public async Task<IActionResult> Index()
         {
             var categoryResult = await _categoryService.GetAll();
-            if (categoryResult == null || !categoryResult.Success || categoryResult.Data == null)
+            if (categoryResult == null || !categoryResult.IsSuccess || categoryResult.Data == null)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -44,13 +44,13 @@ namespace OvgBlog.UI.Controllers
                 return RedirectToAction("Index");
             }
             var categoryResult = await _categoryService.CategoryBySeoUrl(seoUrl);
-            if (categoryResult == null || categoryResult.Data == null || !categoryResult.Success)
+            if (categoryResult == null || categoryResult.Data == null || !categoryResult.IsSuccess)
             {
                 return RedirectToAction("Index");
             }
             ViewData["Title"] = categoryResult.Data.Name;
             var articleResult = await _articleService.GetByCategoryId(categoryResult.Data.Id);
-            if (articleResult == null || articleResult.Data == null || !articleResult.Success)
+            if (articleResult == null || articleResult.Data == null || !articleResult.IsSuccess)
             {
                 return View(new List<ArticleListViewModel>());
             }

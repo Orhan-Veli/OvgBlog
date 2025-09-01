@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using OvgBlog.DAL.Data.Base;
 
 #nullable disable
 
 namespace OvgBlog.DAL.Data
 {
-    public partial class Article
+    public class Article : BaseEntity
     {
         public Article()
         {
@@ -20,12 +21,6 @@ namespace OvgBlog.DAL.Data
         public Guid UserId { get; set; }
         public string SeoUrl { get; set; }
         public string ImageUrl { get; set; }
-        public bool IsDeleted { get; set; }
-        public bool IsActive { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public DateTime? DeletedDate { get; set; }
-        public DateTime? UpdatedDate { get; set; }
-
         public virtual User User { get; set; }
         public virtual ICollection<ArticleCategoryRelation> ArticleCategoryRelations { get; set; }
         public virtual ICollection<ArticleTagRelation> ArticleTagRelations { get; set; }

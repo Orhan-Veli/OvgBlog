@@ -30,13 +30,13 @@ namespace OvgBlog.UI.Pages
         {
             if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
             {
-                Message = "Tüm alanlarý eksiksiz doldurun!";
+                Message = "Tï¿½m alanlarï¿½ eksiksiz doldurun!";
                 return Page();
             }
             var result = await _userService.CheckUser(UserName, Password);
-            if (!result.Success)
+            if (!result.IsSuccess)
             {
-                Message = "Adýnýz ve ya þifreniz yanlýþtýr.";
+                Message = "Adï¿½nï¿½z ve ya ï¿½ifreniz yanlï¿½ï¿½tï¿½r.";
                 return Page();
             }
             var claims = new List<Claim> {

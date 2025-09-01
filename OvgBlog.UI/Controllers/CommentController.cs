@@ -28,7 +28,7 @@ namespace OvgBlog.UI.Controllers
             }
             var model = commentAddViewModel.Adapt<Comment>();
             var result = await _commentService.Create(model);
-            if (!result.Success || result.Data == null)
+            if (!result.IsSuccess || result.Data == null)
             {
                 return Json(new JsonResultModel<CommentAddViewModel>(false, "Model is not valid."));
             }

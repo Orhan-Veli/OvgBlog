@@ -13,11 +13,11 @@ namespace OvgBlog.Business.Constants
         }
         public Result(bool success)
         {
-            Success = success;
+            IsSuccess = success;
         }
         public Result(bool success,T data)
         {
-            Success = success;
+            IsSuccess = success;
             Data = data;
         }
         public Result(bool success, string message) : this(success)
@@ -25,7 +25,7 @@ namespace OvgBlog.Business.Constants
             Message = message;            
         }
 
-        public bool Success { get; }
+        public bool IsSuccess { get; }
         public string Message { get; }
         public T Data { get; }
     }

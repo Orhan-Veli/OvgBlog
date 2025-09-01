@@ -50,7 +50,7 @@
                                     </td>
                                     <td><a asp-controller="Admin" asp-action="GetById" asp-route-Id="@item.Id" class="button-container" type="button"><img src="/uploads/Edit.png" width="20"></a></td>
                                     <form method="post">
-                                        <td><a href="javascript:;" onclick="DeleteArticle('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a></td>
+                                        <td><a href="javascript:" onclick="DeleteArticle('@item.Id', @i)" class="button-container" type="button"><img src="/uploads/Delete.png" width="20"></a></td>
                                     </form>
                                 </tr>
                                 i++;
