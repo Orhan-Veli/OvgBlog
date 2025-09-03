@@ -10,12 +10,12 @@ namespace OvgBlog.Business.Abstract
 {
     public interface IContactService
     {
-        Task<IResult<Contact>> Create(Contact contact, CancellationToken cancellationToken);
+        Task<IResult<Contact>> CreateAsync(Contact contact, CancellationToken cancellationToken);
 
-        Task<IResult<List<Contact>>> GetAll(CancellationToken cancellationToken);
+        Task<IResult<List<Contact>>> GetAllAsync(CancellationToken cancellationToken);
 
-        Task<IResult<Contact>> Get(Guid id, CancellationToken cancellationToken);
+        Task<IResult<Contact>> GetAsync(Guid id, CancellationToken cancellationToken);
 
-        Task<IResult<object>> Delete(Guid id, CancellationToken cancellationToken);
+        Task<IResult<object>> DeleteAsync(Guid id, CancellationToken cancellationToken);
     }
 }

@@ -10,17 +10,17 @@ namespace OvgBlog.Business.Abstract
 {
     public interface ICategoryService
     {
-        Task<IResult<Category>> Create(Category category, CancellationToken cancellationToken);
+        Task<IResult<Category>> CreateAsync(Category category, CancellationToken cancellationToken);
 
-        Task<IResult<object>> Delete(Guid id, CancellationToken cancellationToken);
+        Task<IResult<object>> DeleteAsync(Guid id, CancellationToken cancellationToken);
 
-        Task<IResult<Category>> Update(Category category, CancellationToken cancellationToken);
+        Task<IResult<Category>> UpdateAsync(Category category, CancellationToken cancellationToken);
 
-        Task<IResult<IEnumerable<Category>>> GetAll(CancellationToken cancellationToken);
+        Task<IResult<IEnumerable<Category>>> GetAllAsync(CancellationToken cancellationToken);
 
-        Task<IResult<Category>> GetById(Guid id, CancellationToken cancellationToken);
+        Task<IResult<Category>> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
-        Task<IResult<Category>> CategoryBySeoUrl(string seoUrl, CancellationToken cancellationToken);
+        Task<IResult<Category>> CategoryBySeoUrlAsync(string seoUrl, CancellationToken cancellationToken);
 
         Task<IResult<Category>> FindCategoryIdByName(string name, CancellationToken cancellationToken);
 

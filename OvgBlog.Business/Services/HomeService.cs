@@ -16,12 +16,12 @@ public class HomeService(IArticleRepository articleRepository, ICategoryReposito
 {
     public async Task<HomeDto> GetHomeAsync(CancellationToken cancellationToken)
     {
-        var articlesEntity = await articleRepository.GetFilteredArticles(HomeConstants.ArticleLimit, cancellationToken);
+        var articlesEntity = await articleRepository.GetFilteredArticlesAsync(HomeConstants.ArticleLimit, cancellationToken);
         articlesEntity.ForEach(item => item.Body = item.Body?.Length > HomeConstants.ArticleBodyLimit
             ? (item.Body?[..HomeConstants.ArticleBodyRetrieveLength]?.ToString() ?? string.Empty) + CoreConstants.Ellipsis
             : item.Body);
         
-        var categoriesEntity = await categoryRepository.GetAll(cancellationToken);
+        var categoriesEntity = await categoryRepository.GetAllAsync(cancellationToken);
         foreach (var category in categoriesEntity.IfNullOrEmpty())
         {
             if(category.ImageUrl == null) continue;

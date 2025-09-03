@@ -10,10 +10,10 @@ namespace OvgBlog.Business.Abstract
 {
     public interface IUserService
     {
-        Task<IResult<User>> Create(User user, CancellationToken cancellationToken);
-        Task<IResult<object>> Delete(Guid id, CancellationToken cancellationToken);
-        Task<IResult<User>> Update(User user, CancellationToken cancellationToken);
-        Task<IResult<User>> GetById(Guid id, CancellationToken cancellationToken);
-        Task<IResult<bool>> CheckUser(string userName, string password, CancellationToken cancellationToken);
+        Task<IResult<User>> CreateAsync(User user, CancellationToken cancellationToken);
+        Task<IResult<object>> DeleteAsync(Guid id, CancellationToken cancellationToken);
+        Task<IResult<User>> UpdateAsync(User user, CancellationToken cancellationToken);
+        Task<IResult<User>> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<IResult<bool>> CheckUserAsync(string userName, string password, CancellationToken cancellationToken);
     }
 }

@@ -8,11 +8,6 @@ namespace OvgBlog.DAL.Data
 {
     public class Category : BaseEntity
     {
-        public Category()
-        {
-            ArticleCategoryRelations = new HashSet<ArticleCategoryRelation>();
-        }
-
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string ImageUrl { get; set; }

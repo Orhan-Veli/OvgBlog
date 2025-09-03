@@ -10,10 +10,10 @@ namespace OvgBlog.Business.Abstract
 {
     public interface ICommentService
     {
-        Task<IResult<Comment>> Create(Comment comment, CancellationToken cancellationToken);
-        Task<IResult<object>> Delete(Guid id, CancellationToken cancellationToken);
-        Task<IResult<Comment>> Update(Comment comment, CancellationToken cancellationToken);
-        Task<IResult<IEnumerable<Comment>>> GetAll(CancellationToken cancellationToken);
-        Task<IResult<Comment>> GetById(Guid id, CancellationToken cancellationToken);
+        Task<IResult<Comment>> CreateAsync(Comment comment, CancellationToken cancellationToken);
+        Task<IResult<object>> DeleteAsync(Guid id, CancellationToken cancellationToken);
+        Task<IResult<Comment>> UpdateAsync(Comment comment, CancellationToken cancellationToken);
+        Task<IResult<IEnumerable<Comment>>> GetAllAsync(CancellationToken cancellationToken);
+        Task<IResult<Comment>> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     }
 }

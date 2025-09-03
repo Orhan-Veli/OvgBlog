@@ -8,11 +8,6 @@ namespace OvgBlog.UI.Models
 {
     public class ArticleAddViewModel
     {
-        //public ArticleViewModel ArticleViewModels { get; set; }
-        public ArticleAddViewModel()
-        {
-            CategoryList = new List<CategoryListViewModel>();
-        }
         public string Title { get; set; }
         public string Body { get; set; }
         public string SeoUrl { get; set; }
@@ -21,6 +16,6 @@ namespace OvgBlog.UI.Models
         public string TagName { get; set; }
         public Guid CategoryId { get; set; }
 
-        public List<CategoryListViewModel> CategoryList { get; set; }
+        public List<CategoryListViewModel> CategoryList { get; set; } = new();
     }
 }

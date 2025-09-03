@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OvgBlog.UI.Controllers
@@ -38,7 +39,7 @@ namespace OvgBlog.UI.Controllers
             _contactService = contactService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {          
             var model = new HomeViewModel();
 
@@ -47,7 +48,7 @@ namespace OvgBlog.UI.Controllers
             return View(model);
         }
 
-        public IActionResult Categories()
+        public IActionResult Categories(CancellationToken cancellationToken)
         {
             return View();
         }
@@ -59,7 +60,7 @@ namespace OvgBlog.UI.Controllers
             return View(model);
         }
         [HttpGet]
-        public IActionResult AboutMe()
+        public IActionResult AboutMe(CancellationToken cancellationToken)
         {
 
             return View();
@@ -97,14 +98,14 @@ namespace OvgBlog.UI.Controllers
 
         //}
         [HttpPost]
-        public async Task<IActionResult> AddContact(ContactListViewModel contactListViewModel)
+        public async Task<IActionResult> AddContact(ContactListViewModel contactListViewModel, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
                 return Json(new JsonResultModel<ContactListViewModel>(false, "Alanları doldurun."));
             }
             var model = contactListViewModel.Adapt<Contact>();
-            await _contactService.Create(model);
+            await _contactService.CreateAsync(model, cancellationToken);
             return Json(new JsonResultModel<ContactListViewModel>(true, "Mesajınız iletildi en kısa sürede geri dönüş yapılacaktır."));
         }
     }

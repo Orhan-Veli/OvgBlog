@@ -12,7 +12,7 @@ public class ArticleRepository(OvgBlogContext context) : EntityRepository<Articl
 {
     private readonly OvgBlogContext _context = context;
 
-    public async Task<List<Article>> GetFilteredArticles(int size, CancellationToken cancellationToken)
+    public async Task<List<Article>> GetFilteredArticlesAsync(int size, CancellationToken cancellationToken)
     {
         var result = await _context.Articles
             .Include(x => x.ArticleCategoryRelations)

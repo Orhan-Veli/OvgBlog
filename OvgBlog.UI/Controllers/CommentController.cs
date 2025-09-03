@@ -7,6 +7,7 @@ using OvgBlog.UI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OvgBlog.UI.Controllers
@@ -20,14 +21,14 @@ namespace OvgBlog.UI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddComment(CommentAddViewModel commentAddViewModel)
+        public async Task<IActionResult> AddComment(CommentAddViewModel commentAddViewModel, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid || !commentAddViewModel.Email.EmailValidation())
             {
                 return Json(new JsonResultModel<CommentAddViewModel>(false, "Model is not valid."));
             }
             var model = commentAddViewModel.Adapt<Comment>();
-            var result = await _commentService.Create(model);
+            var result = await _commentService.CreateAsync(model, cancellationToken);
             if (!result.IsSuccess || result.Data == null)
             {
                 return Json(new JsonResultModel<CommentAddViewModel>(false, "Model is not valid."));

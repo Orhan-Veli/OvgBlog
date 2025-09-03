@@ -14,23 +14,23 @@ namespace OvgBlog.DAL.Concrete
         where TEntity : BaseEntity, new()
 
     {
-        public async Task Create(TEntity entity, CancellationToken cancellationToken)
+        public async Task CreateAsync(TEntity entity, CancellationToken cancellationToken)
         {
             var addedEntity = context.Entry(entity);
             addedEntity.State = EntityState.Added;
             await context.SaveChangesAsync(cancellationToken);
         }
         
-        public async Task Delete(Guid id, CancellationToken cancellationToken)
+        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
             var deletedEntity = context.Entry(id);
             deletedEntity.State = EntityState.Deleted;
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAll(CancellationToken cancellationToken, Expression<Func<TEntity, bool>> filter = null, Expression<Func<TEntity, object>> includeFilter = null)
+        public async Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken, Expression<Func<TEntity, bool>> filter = null, Expression<Func<TEntity, object>> includeFilter = null)
         {
-            IEnumerable<TEntity> result = null;
+            List<TEntity> result = null;
 
             if (filter == null)
             {
@@ -47,7 +47,7 @@ namespace OvgBlog.DAL.Concrete
             return result;
         }
 
-        public async Task<TEntity> Get(CancellationToken cancellationToken, Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeFilters = null)
+        public async Task<TEntity> GetAsync(CancellationToken cancellationToken, Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeFilters = null)
         {
 
             if (includeFilters == null || includeFilters.Count == 0)
@@ -70,12 +70,19 @@ namespace OvgBlog.DAL.Concrete
 
         }
 
-        public async Task<TEntity> Update(TEntity model, CancellationToken cancellationToken)
+        public async Task<TEntity> UpdateAsync(TEntity model, CancellationToken cancellationToken)
         {
             var updatedEntity = context.Entry(model);
             updatedEntity.State = EntityState.Modified;
             await context.SaveChangesAsync(cancellationToken);
             return updatedEntity.Entity;
+        }
+        
+        public async Task<List<TEntity>> GetListByExpressionsAsync(Expression<Func<TEntity, bool>> filter, CancellationToken cancellationToken, bool isTracking = false, List<Expression<Func<TEntity, object>>> includeFilters = null)
+        {
+            return !isTracking ? 
+                await context.Set<TEntity>().Where(filter).AsNoTracking().ToListAsync(cancellationToken): 
+                await context.Set<TEntity>().Where(filter).ToListAsync(cancellationToken);
         }
     }
 }

@@ -13,7 +13,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
+using OvgBlog.Business.Dto;
 
 namespace OvgBlog.UI.Controllers
 {
@@ -50,23 +52,23 @@ namespace OvgBlog.UI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {                 
             var adminViewModelCounts = new AdminListViewModel
             {
-                ArticleCount = _articleService.GetAll().Result.Data.Count(),
-                CategoryCount = _categoryService.GetAll().Result.Data.Count(),
-                TagCount = _tagService.GetAll().Result.Data.Count(),
-                CommentCount =  _commentService.GetAll().Result.Data.Count(),    
-                ContactCount =  _contactService.GetAll().Result.Data.Count()
+                ArticleCount = _articleService.GetAllAsync(cancellationToken).Result.Data.Count(),
+                CategoryCount = _categoryService.GetAllAsync(cancellationToken).Result.Data.Count(),
+                TagCount = _tagService.GetAllAsync(cancellationToken).Result.Data.Count(),
+                CommentCount =  _commentService.GetAllAsync(cancellationToken).Result.Data.Count(),    
+                ContactCount =  _contactService.GetAllAsync(cancellationToken).Result.Data.Count()
             };
             return View(adminViewModelCounts);
         }
 
         [HttpGet]
-        public async Task<IActionResult> CategoryList()
+        public async Task<IActionResult> CategoryList(CancellationToken cancellationToken)
         {
-            var entity = await _categoryService.GetAll();
+            var entity = await _categoryService.GetAllAsync(cancellationToken);
             var categoryList = entity.Data.Adapt<List<CategoryListViewModel>>();
             return View(categoryList);
         }
@@ -74,25 +76,25 @@ namespace OvgBlog.UI.Controllers
         [HttpGet]
         public IActionResult AddCategory()
         {
-            var key = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name).Value;
+           
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCategory(CategoryAddViewModel categoryAddViewModel)
+        public async Task<IActionResult> AddCategory(CategoryAddViewModel categoryAddViewModel, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
                 return Json(new JsonResultModel<Category>(false, "Tüm alanları doldurun."));
             }
             categoryAddViewModel.SeoUrl = categoryAddViewModel.SeoUrl.ReplaceSeoUrl();
-            var result = await _categoryService.CategoryBySeoUrl(categoryAddViewModel.SeoUrl);
+            var result = await _categoryService.CategoryBySeoUrlAsync(categoryAddViewModel.SeoUrl, cancellationToken);
             if (result.IsSuccess)
             {
                 return Json(new JsonResultModel<Category>(false, "SeoUrl zaten bulunuyor."));
             }
             var category = categoryAddViewModel.Adapt<Category>();
-            var createResult = await _categoryService.Create(category);
+            var createResult = await _categoryService.CreateAsync(category, cancellationToken);
             if (!createResult.IsSuccess || createResult.Data == null)
             {
                 return Json(new JsonResultModel<Category>(false, "Kayıt Eklenemedi"));
@@ -101,9 +103,9 @@ namespace OvgBlog.UI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateCategory(CategoryListViewModel categoryListViewModel)
+        public async Task<IActionResult> UpdateCategory(CategoryListViewModel categoryListViewModel, CancellationToken cancellationToken)
         {
-            var result = await _categoryService.GetById(categoryListViewModel.Id);
+            var result = await _categoryService.GetByIdAsync(categoryListViewModel.Id, cancellationToken);
             if (result.Data == null)
             {
                 return Json(new JsonResultModel<Category>(false, "Category is not found."));
@@ -111,120 +113,74 @@ namespace OvgBlog.UI.Controllers
             result.Data.ImageUrl = categoryListViewModel.ImageUrl;
             result.Data.SeoUrl = categoryListViewModel.SeoUrl;
             result.Data.Name = categoryListViewModel.Name;
-            await _categoryService.Update(result.Data);
+            await _categoryService.UpdateAsync(result.Data, cancellationToken);
             return Json(new JsonResultModel<Category>(true, result.Data, "Güncellendi."));
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteCategory(Guid id)
+        public async Task<IActionResult> DeleteCategory(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
                 return Json(new JsonResultModel<Category>(false, "Geçersiz kategori id"));
             }
-            var deleteResult = await _categoryService.Delete(id);
+            var deleteResult = await _categoryService.DeleteAsync(id, cancellationToken);
             return Json(new JsonResultModel<Category>(deleteResult.IsSuccess, deleteResult.Message));
         }
         [HttpGet]
-        public async Task<IActionResult> AddArticle()
+        public async Task<IActionResult> AddArticle(CancellationToken cancellationToken)
         {
             var model = new ArticleAddViewModel();
-            var result = await _categoryService.GetAll();
+            var result = await _categoryService.GetAllAsync(cancellationToken);
             model.CategoryList = result.Data.ToList().Adapt<List<CategoryListViewModel>>();
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddArticle(ArticleAddViewModel model)
+        public async Task<IActionResult> AddArticle(ArticleAddViewModel model, CancellationToken cancellationToken)
 
         {            
-            //Needs to move business
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-            string wwwRootPath = _webHostEnvironment.WebRootPath;
-            string fileName = Path.GetFileNameWithoutExtension(model.FileImageUrl.FileName);
-            string extension = Path.GetExtension(model.FileImageUrl.FileName);
-            string path = Path.Combine(wwwRootPath+"/uploads/",fileName + extension);
-            using (var fileStream = new FileStream(path, FileMode.Create))
+            
+            var dto = model.Adapt<CreateArticleDto>();
+            var userKey = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+            if (userKey != null)
             {
-                await model.FileImageUrl.CopyToAsync(fileStream);
+                dto.UserId = Guid.TryParse(userKey, out var parsedId) ? parsedId : Guid.Empty;
             }
-            model.ImageUrl = model.FileImageUrl.FileName;
-            model.SeoUrl = model.SeoUrl.ReplaceSeoUrl();
-            var result = await _articleService.GetBySeoUrl(model.SeoUrl);
-            if (result.IsSuccess && result.Data != null)
-            {
-                ModelState.AddModelError("SeoUrl", "SeoUrl is already taken");
-                return View(model);
-            }
-
-            var tags = model.TagName.Split(",");
-            var article = model.Adapt<Article>();
-            for (var i = 0; i < tags.Length; i++)
-            {
-                var tagRelation = new ArticleTagRelation
-                {
-                    Id = Guid.NewGuid(),
-                    CreatedDate = DateTime.Now
-                };
-
-                var getTag = await _tagService.FindIdByName(tags[i]);
-                
-                if (getTag.Data != null)
-                {
-                    tagRelation.TagId = getTag.Data.Id;
-                }
-                else
-                {
-                    var tagModel = new Tag { Name = tags[i],SeoUrl=tags[i].ReplaceSeoUrl(), CreatedDate = DateTime.Now, Id = Guid.NewGuid() };
-                    await _tagService.Create(tagModel);
-                    tagRelation.Tag = new Tag
-                    {
-                        Id = tagModel.Id,
-                        CreatedDate = DateTime.Now,
-                        Name=tagModel.Name,
-                        SeoUrl=tagModel.SeoUrl
-                    };
-                    tagRelation.TagId = tagModel.Id;
-                }                
-                
-                article.ArticleTagRelations.Add(tagRelation);
-            }
-            article.ArticleCategoryRelations.Add(new ArticleCategoryRelation
-            {
-                Id = Guid.NewGuid(),
-                CategoryId = model.CategoryId,
-                CreatedDate = DateTime.Now
-            });
-            await _articleService.Create(article);
+            
+            dto.RootPath = _webHostEnvironment.WebRootPath;
+            await _articleService.CreateAsync(dto, cancellationToken);
+            
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public async Task<IActionResult> ArticleList()
+        public async Task<IActionResult> ArticleList(CancellationToken cancellationToken)
         {
-            var list = await _articleService.GetAll();
+            var list = await _articleService.GetAllAsync(cancellationToken);
             var articleList = list.Data.Adapt<List<ArticleListViewModel>>();
             return View(articleList);
         }
 
         [HttpGet]
-        public async Task<IActionResult> UpdateArticle(Guid id)
+        public async Task<IActionResult> UpdateArticle(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
                 ModelState.AddModelError(string.Empty, "Id is not valid.");
                 return RedirectToAction("ArticleListView");
             }
-            var result = await _articleService.GetById(id);
+            var result = await _articleService.GetByIdAsync(id, cancellationToken);
             if (result.Data == null)
             {
                 ModelState.AddModelError(string.Empty, "You dont have this Category.");
                 return RedirectToAction("ArticleListView");
             }
-            var categoryResult = await _categoryService.GetAll();
+            var categoryResult = await _categoryService.GetAllAsync(cancellationToken);
             var categoryList = categoryResult.Data.ToList().Adapt<List<CategoryListViewModel>>();
             var articleResult = result.Data.Adapt<ArticleUpdateViewModel>();
             var categoryId = result.Data.ArticleCategoryRelations.FirstOrDefault().CategoryId;
@@ -234,10 +190,10 @@ namespace OvgBlog.UI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateArticle(ArticleUpdateViewModel articleUpdateViewModel)
+        public async Task<IActionResult> UpdateArticle(ArticleUpdateViewModel articleUpdateViewModel, CancellationToken cancellationToken)
         {
             //Need to move business
-            var result = await _articleService.GetById(articleUpdateViewModel.Id);
+            var result = await _articleService.GetByIdAsync(articleUpdateViewModel.Id, cancellationToken);
             if (result.Data == null)
             {
                 ModelState.AddModelError(string.Empty, "Category is not found.");
@@ -273,78 +229,78 @@ namespace OvgBlog.UI.Controllers
                 Id = Guid.NewGuid(),
                 ArticleId = result.Data.Id
             });
-            await _articleService.Update(result.Data);
+            //await _articleService.UpdateAsync(result.Data, cancellationToken);
             return RedirectToAction("ArticleList");
         }
 
         [HttpGet]
-        public async Task<IActionResult> TagList()
+        public async Task<IActionResult> TagList(CancellationToken cancellationToken)
         {
-            var list = await _tagService.GetAll();
+            var list = await _tagService.GetAllAsync(cancellationToken);
             var tagList = list.Data.Where(x=> !x.IsDeleted).Adapt<List<TagViewModel>>();
             return View(tagList);
         }
         [HttpDelete]
-        public async Task<IActionResult> DeleteTag(Guid id)
+        public async Task<IActionResult> DeleteTag(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
                 return Json(new JsonResultModel<Tag>(false, "Geçersiz tag id"));
             }
-            var deleteResult = await _tagService.Delete(id);
+            var deleteResult = await _tagService.DeleteAsync(id, cancellationToken);
             return Json(new JsonResultModel<Tag>(deleteResult.IsSuccess, deleteResult.Message));
         }
         [HttpGet]
-        public async Task<IActionResult> CommentList()
+        public async Task<IActionResult> CommentList(CancellationToken cancellationToken)
         {
-            var list = await _commentService.GetAll();
+            var list = await _commentService.GetAllAsync(cancellationToken);
             var commentList = list.Data.Adapt<List<CommentViewModel>>();
             return View(commentList);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteComment(Guid id)
+        public async Task<IActionResult> DeleteComment(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
                 return Json(new JsonResultModel<Comment>(false, "Geçersiz article id"));
             }
-            var deleteResult = await _commentService.Delete(id);
+            var deleteResult = await _commentService.DeleteAsync(id, cancellationToken);
             return Json(new JsonResultModel<Comment>(deleteResult.IsSuccess, deleteResult.Message));
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteArticle(Guid id)
+        public async Task<IActionResult> DeleteArticle(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
                 return Json(new JsonResultModel<Article>(false, "Geçersiz article id"));
             }
-            var imageModel = await _articleService.GetById(id);
+            var imageModel = await _articleService.GetByIdAsync(id, cancellationToken);
             var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", imageModel.Data.ImageUrl);
             if (System.IO.File.Exists(imagePath))
             {
                 System.IO.File.Delete(imagePath);
             }
-            var deleteResult = await _articleService.Delete(id);            
+            var deleteResult = await _articleService.DeleteAsync(id, cancellationToken);            
             return Json(new JsonResultModel<Article>(deleteResult.IsSuccess, deleteResult.Message));
         }
         [HttpGet]
-        public async Task<IActionResult> ContactList()
+        public async Task<IActionResult> ContactList(CancellationToken cancellationToken)
         {
-            var result = await _contactService.GetAll();
+            var result = await _contactService.GetAllAsync(cancellationToken);
             var list = result.Data.Adapt<List<ContactListViewModel>>();
             return View(list);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
                 return RedirectToAction("ContactList");
             }
-            var result = await _contactService.Get(id);
+            var result = await _contactService.GetAsync(id, cancellationToken);
             if (result == null || result.Data == null || !result.IsSuccess)
             {
                 return RedirectToAction("ContactList");
@@ -353,13 +309,13 @@ namespace OvgBlog.UI.Controllers
             return View("ContactView", model);
         }
         [HttpDelete]
-        public async Task<IActionResult> DeleteContact(Guid id)
+        public async Task<IActionResult> DeleteContact(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
                 return Json(new JsonResultModel<ContactListViewModel>(false, "Id is not valid."));
             }
-            await _contactService.Delete(id);
+            await _contactService.DeleteAsync(id, cancellationToken);
             return Json(new JsonResultModel<ContactListViewModel>(true, "Kayıt silinmiştir."));
         }
     }

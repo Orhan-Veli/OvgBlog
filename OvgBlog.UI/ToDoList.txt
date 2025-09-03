@@ -1,0 +1,8 @@
+
+ToDo:
+
+1- Serilog needs to be added
+2- Unit tests need to be added
+3- Language changes needs to be added
+4- web socket needs to be added only for live user count 
+5- polly needs to be added

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -26,14 +27,14 @@ namespace OvgBlog.UI.Pages
         public string Password { get; set; }
         public string Message { get; set; }
 
-        public async Task<IActionResult> OnPost(string returnUrl = null)
+        public async Task<IActionResult> OnPost(CancellationToken cancellationToken, string returnUrl)
         {
             if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
             {
                 Message = "T�m alanlar� eksiksiz doldurun!";
                 return Page();
             }
-            var result = await _userService.CheckUser(UserName, Password);
+            var result = await _userService.CheckUserAsync(UserName, Password, cancellationToken);
             if (!result.IsSuccess)
             {
                 Message = "Ad�n�z ve ya �ifreniz yanl��t�r.";

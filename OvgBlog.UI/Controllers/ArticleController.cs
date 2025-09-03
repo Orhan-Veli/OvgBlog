@@ -5,6 +5,7 @@ using OvgBlog.Business.Abstract;
 using OvgBlog.UI.Models;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Threading;
 
 namespace OvgBlog.UI.Controllers
 {
@@ -23,10 +24,8 @@ namespace OvgBlog.UI.Controllers
             _tagService = tagService;
         }
 
-        // ovgblog.com/article/yazinin-basligi
-        //[Route("{seoUrl}")]
         [HttpGet("article/{seoUrl}")]
-        public async Task<IActionResult> Index(string seoUrl)
+        public async Task<IActionResult> Index(string seoUrl, CancellationToken cancellationToken)
         
          {
             if (string.IsNullOrEmpty(seoUrl))
@@ -34,17 +33,17 @@ namespace OvgBlog.UI.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var response = await _articleService.GetBySeoUrl(seoUrl);           
+            var response = await _articleService.GetBySeoUrlAsync(seoUrl, cancellationToken);           
             if (!response.IsSuccess)
             {
                 return RedirectToAction("Index", "Home");
             }
             response.Data.Comments = response.Data.Comments.Where(x => !x.IsDeleted).ToList();
-            var articleTags = await _tagService.GetAll();
+            var articleTags = await _tagService.GetAllAsync(cancellationToken);
             if (articleTags.Data == null || !articleTags.IsSuccess || response.Data.ArticleTagRelations.Count == 0)
             {
                 var model = response.Data.Adapt<ArticleDetailViewModel>();               
-                var userResponse = await _userService.GetById(response.Data.UserId);
+                var userResponse = await _userService.GetByIdAsync(response.Data.UserId, cancellationToken);
                 if (userResponse.IsSuccess)
                 {
                     model.UserName = userResponse.Data.Name;
@@ -54,7 +53,7 @@ namespace OvgBlog.UI.Controllers
             else
             {
                 var articleTagIds = response.Data.ArticleTagRelations.Select(x => x.TagId).ToList();
-                var tagListResponse = await _tagService.GetByIds(articleTagIds);
+                var tagListResponse = await _tagService.GetByIdsAsync(articleTagIds, cancellationToken);
                 
                 var model = response.Data.Adapt<ArticleDetailViewModel>();                
                 foreach (var item in tagListResponse.Data)
@@ -64,7 +63,7 @@ namespace OvgBlog.UI.Controllers
                         model.Tags.Add(item.Adapt<TagViewModel>());
                     }                   
                 }
-                var userResponse = await _userService.GetById(response.Data.UserId);
+                var userResponse = await _userService.GetByIdAsync(response.Data.UserId, cancellationToken);
                 if (userResponse.IsSuccess)
                 {
                     model.UserName = userResponse.Data.Name;

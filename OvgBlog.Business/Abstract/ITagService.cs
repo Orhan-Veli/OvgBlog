@@ -10,14 +10,14 @@ namespace OvgBlog.Business.Abstract
 {
     public interface ITagService
     {
-        Task<IResult<Tag>> Create(Tag tag, CancellationToken cancellationToken);
-        Task<IResult<object>> Delete(Guid id, CancellationToken cancellationToken);
-        Task<IResult<Tag>> Update(Tag tag, CancellationToken cancellationToken);
-        Task<IResult<IEnumerable<Tag>>> GetAll(CancellationToken cancellationToken);
-        Task<IResult<Tag>> GetById(Guid id, CancellationToken cancellationToken);
-        Task<IResult<Tag>> FindIdByName(string name, CancellationToken cancellationToken);
+        Task<IResult<Tag>> CreateAsync(Tag tag, CancellationToken cancellationToken);
+        Task<IResult<object>> DeleteAsync(Guid id, CancellationToken cancellationToken);
+        Task<IResult<Tag>> UpdateAsync(Tag tag, CancellationToken cancellationToken);
+        Task<IResult<IEnumerable<Tag>>> GetAllAsync(CancellationToken cancellationToken);
+        Task<IResult<Tag>> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<IResult<Tag>> FindIdByNameAsync(string name, CancellationToken cancellationToken);
 
-        Task<IResult<IEnumerable<Tag>>> GetByIds(List<Guid> ids, CancellationToken cancellationToken);
+        Task<IResult<IEnumerable<Tag>>> GetByIdsAsync(List<Guid> ids, CancellationToken cancellationToken);
 
     }
 }

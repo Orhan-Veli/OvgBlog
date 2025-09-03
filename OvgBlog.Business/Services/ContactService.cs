@@ -18,44 +18,44 @@ namespace OvgBlog.Business.Services
         {
             _contactRepository = contactRepository;
         }
-        public async Task<IResult<Contact>> Create(Contact contact, CancellationToken cancellationToken)
+        public async Task<IResult<Contact>> CreateAsync(Contact contact, CancellationToken cancellationToken)
         {
             if (contact==null || string.IsNullOrEmpty(contact.Name) || string.IsNullOrEmpty(contact.Email) || string.IsNullOrEmpty(contact.Body))
             {
-                return new Result<Contact>(false,Message.ModelNotValid);
+                return new Result<Contact>(false,ErrorMessages.ModelNotValid);
             }
             contact.Id = Guid.NewGuid();
             contact.IsDeleted = false;
             contact.SendDate = DateTime.Now;
-            await _contactRepository.Create(contact, cancellationToken);
+            await _contactRepository.CreateAsync(contact, cancellationToken);
             return new Result<Contact>(true);
         }
 
-        public async Task<IResult<object>> Delete(Guid id, CancellationToken cancellationToken)
+        public async Task<IResult<object>> DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
             if (id==Guid.Empty)
             {
-                return new Result<object>(false, Message.IdIsNotValid);
+                return new Result<object>(false, ErrorMessages.IdIsNotValid);
             }
-            var model = await _contactRepository.Get(cancellationToken, x=> x.Id==id);
+            var model = await _contactRepository.GetAsync(cancellationToken, x=> x.Id==id);
             model.IsDeleted = true;
-            await _contactRepository.Update(model, cancellationToken);
+            await _contactRepository.UpdateAsync(model, cancellationToken);
             return new Result<object>(true);
         }
 
-        public async Task<IResult<Contact>> Get(Guid id, CancellationToken cancellationToken)
+        public async Task<IResult<Contact>> GetAsync(Guid id, CancellationToken cancellationToken)
         {
             if (id==Guid.Empty)
             {
-                return new Result<Contact>(false, Message.IdIsNotValid);
+                return new Result<Contact>(false, ErrorMessages.IdIsNotValid);
             }
-            var result = await _contactRepository.Get(cancellationToken, x=> x.Id==id);
+            var result = await _contactRepository.GetAsync(cancellationToken, x=> x.Id==id);
             return new Result<Contact>(true, result);
         }
 
-        public async Task<IResult<List<Contact>>> GetAll(CancellationToken cancellationToken)
+        public async Task<IResult<List<Contact>>> GetAllAsync(CancellationToken cancellationToken)
         {
-            var list = await _contactRepository.GetAll(cancellationToken);
+            var list = await _contactRepository.GetAllAsync(cancellationToken);
            return new Result<List<Contact>>(true, list.Where(x=> !x.IsDeleted).ToList());
         }
     }

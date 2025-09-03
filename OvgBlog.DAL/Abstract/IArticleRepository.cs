@@ -7,5 +7,5 @@ namespace OvgBlog.DAL.Abstract;
 
 public interface IArticleRepository : IEntityRepository<Article>
 {
-    Task<List<Article>> GetFilteredArticles(int size, CancellationToken cancellationToken);
+    Task<List<Article>> GetFilteredArticlesAsync(int size, CancellationToken cancellationToken);
 }

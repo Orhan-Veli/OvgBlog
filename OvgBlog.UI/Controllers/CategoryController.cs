@@ -6,6 +6,7 @@ using OvgBlog.UI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OvgBlog.UI.Controllers
@@ -22,9 +23,9 @@ namespace OvgBlog.UI.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            var categoryResult = await _categoryService.GetAll();
+            var categoryResult = await _categoryService.GetAllAsync(cancellationToken);
             if (categoryResult == null || !categoryResult.IsSuccess || categoryResult.Data == null)
             {
                 return RedirectToAction("Index", "Home");
@@ -34,22 +35,21 @@ namespace OvgBlog.UI.Controllers
             return View(map);
         }
 
-        //  ovgblog.com/category/music
         [HttpGet("Category/{seoUrl}")]
-        public async Task<IActionResult> Detail(string seoUrl)
+        public async Task<IActionResult> Detail(string seoUrl, CancellationToken cancellationToken)
         {
             ViewData["Title"] = "Kategori";
             if (string.IsNullOrEmpty(seoUrl))
             {
                 return RedirectToAction("Index");
             }
-            var categoryResult = await _categoryService.CategoryBySeoUrl(seoUrl);
+            var categoryResult = await _categoryService.CategoryBySeoUrlAsync(seoUrl, cancellationToken);
             if (categoryResult == null || categoryResult.Data == null || !categoryResult.IsSuccess)
             {
                 return RedirectToAction("Index");
             }
             ViewData["Title"] = categoryResult.Data.Name;
-            var articleResult = await _articleService.GetByCategoryId(categoryResult.Data.Id);
+            var articleResult = await _articleService.GetByCategoryIdAsync(categoryResult.Data.Id, cancellationToken);
             if (articleResult == null || articleResult.Data == null || !articleResult.IsSuccess)
             {
                 return View(new List<ArticleListViewModel>());
