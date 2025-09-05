@@ -7,98 +7,122 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Mapster;
+using OvgBlog.Business.Dto;
+using OvgBlog.DAL.Helpers;
 
 namespace OvgBlog.Business.Services
 {
     public class TagService(IEntityRepository<Tag> tagRepository) : ITagService
     {
-        public async Task<IResult<Tag>> CreateAsync(Tag tag, CancellationToken cancellationToken)
+        public async Task<IResult<TagDto>> CreateAsync(CreateTagDto dto, CancellationToken cancellationToken)
         {
-            if (tag == null || string.IsNullOrEmpty(tag.Name) || string.IsNullOrEmpty(tag.SeoUrl))
+            if (dto == null)
             {
-                return new Result<Tag>(false, ErrorMessages.ModelNotValid);
+                throw new OvgBlogException(ErrorMessages.TagNotFound);
             }
-            tag.Id = Guid.NewGuid();
-            tag.CreatedDate = DateTime.Now;
-            await tagRepository.CreateAsync(tag, cancellationToken);
-            return new Result<Tag>(true, tag);
+
+            var entity = dto.Adapt<Tag>();
+            entity.CreatedDate = DateTime.UtcNow;
+            await tagRepository.CreateAsync(entity, cancellationToken);
+            
+            var result = entity.Adapt<TagDto>();
+            return new Result<TagDto>(true, result);
         }
 
         public async Task<IResult<object>> DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
-            {
-                return new Result<object>(false, ErrorMessages.IdIsNotValid);
+            { 
+                throw new OvgBlogException(ErrorMessages.IdIsNotValid);
             }
-            var tagEntity = await tagRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
-            if (tagEntity == null)
+            
+            var entity = await tagRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
+            if (entity == null)
             {
-                return new Result<Object>(false, ErrorMessages.TagNotFound);
+                throw new OvgBlogException(ErrorMessages.TagNotFound);
             }
-            tagEntity.IsDeleted = true;
-            tagEntity.DeletedDate = DateTime.Now;
-            await tagRepository.UpdateAsync(tagEntity, cancellationToken);
+            
+            
+            entity.DeletedDate = DateTime.UtcNow;
+            entity.IsDeleted = true;
+            await tagRepository.UpdateAsync(entity, cancellationToken);
             return new Result<object>(true);
         }
 
-        public async Task<IResult<Tag>> FindIdByNameAsync(string name, CancellationToken cancellationToken)
+        public async Task<IResult<TagDto>> FindIdByNameAsync(string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(name))
             {
-                return new Result<Tag>(false, ErrorMessages.NameNotFound);
+                throw new OvgBlogException(ErrorMessages.NameNotFound);
             }
+            
             var result = await tagRepository.GetAsync(cancellationToken, x => x.Name == name && !x.IsDeleted);
             if (result == null)
             {
-                return new Result<Tag>(false, ErrorMessages.TagNotFound);
+                return new Result<TagDto>(false, ErrorMessages.TagNotFound);
             }
-            return new Result<Tag>(true, result);
+            
+            var resultDto = result.Adapt<TagDto>();
+            return new Result<TagDto>(true, resultDto);
         }
 
-        public async Task<IResult<IEnumerable<Tag>>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<IResult<IEnumerable<TagDto>>> GetAllAsync(TagFilterDto filterDto, CancellationToken cancellationToken)
         {
-            var list = await tagRepository.GetAllAsync(cancellationToken, x => !x.IsDeleted);
-            return new Result<IEnumerable<Tag>>(true, list);
+            var entites = await tagRepository.GetAllAsync(cancellationToken, x => !x.IsDeleted);
+            
+            var result = entites.Adapt<IEnumerable<TagDto>>();
+            return new Result<IEnumerable<TagDto>>(true, result);
         }
 
-        public async Task<IResult<Tag>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<IResult<TagDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
-                return new Result<Tag>(false, ErrorMessages.IdIsNotValid);
+                throw new OvgBlogException(ErrorMessages.IdIsNotValid);
             }
-            var tagEntity = await tagRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
-            if (tagEntity == null)
+            
+            var entity = await tagRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
+            if (entity == null)
             {
-                return new Result<Tag>(false, ErrorMessages.TagNotFound);
+                throw new OvgBlogException(ErrorMessages.TagNotFound);
             }
-            return new Result<Tag>(true, tagEntity);
+            
+            var resultDto = entity.Adapt<TagDto>();
+            return new Result<TagDto>(true, resultDto);
         }
 
-        public async Task<IResult<IEnumerable<Tag>>> GetByIdsAsync(List<Guid> ids, CancellationToken cancellationToken)
+        public async Task<IResult<IEnumerable<TagDto>>> GetByIdsAsync(List<Guid> ids, CancellationToken cancellationToken)
         {
             if (ids == null ||ids.Count==0)
             {
-                return new Result<IEnumerable<Tag>>(false, ErrorMessages.IdIsNotValid);
+                throw new OvgBlogException(ErrorMessages.IdIsNotValid);
             }
-            var tagEntities = await tagRepository.GetAllAsync(cancellationToken, x=> ids.Contains(x.Id));
-            return new Result<IEnumerable<Tag>>(true,tagEntities);
+            
+            var entities = await tagRepository.GetAllAsync(cancellationToken, x=> ids.Contains(x.Id));
+            
+            var resultDto = entities.Adapt<IEnumerable<TagDto>>();
+            return new Result<IEnumerable<TagDto>>(true, resultDto);
         }
 
-        public async Task<IResult<Tag>> UpdateAsync(Tag tag, CancellationToken cancellationToken)
+        public async Task<IResult<TagDto>> UpdateAsync(UpdateTagDto tag, CancellationToken cancellationToken)
         {
-            if (tag == null || string.IsNullOrEmpty(tag.Name) || string.IsNullOrEmpty(tag.SeoUrl))
+            if (tag == null)
             {
-                return new Result<Tag>(false, ErrorMessages.ModelNotValid);
+                throw new OvgBlogException(ErrorMessages.DtoCannotBeNull);
             }
-            var tagEntity = await tagRepository.GetAsync(cancellationToken, x => x.Id == tag.Id && !x.IsDeleted);
-            if (tagEntity == null)
+            
+            var entity = await tagRepository.GetAsync(cancellationToken, x => x.Id == tag.Id && !x.IsDeleted);
+            if (entity == null)
             {
-                return new Result<Tag>(false, ErrorMessages.TagNotFound);
+                throw new OvgBlogException(ErrorMessages.TagNotFound);
             }
-            tag.UpdatedDate = DateTime.Now;
-            tagEntity = await tagRepository.UpdateAsync(tag, cancellationToken);
-            return new Result<Tag>(true, tagEntity);
+            
+            entity.UpdatedDate = DateTime.UtcNow;
+            entity = await tagRepository.UpdateAsync(entity, cancellationToken);
+            
+            var result = entity.Adapt<TagDto>();
+            return new Result<TagDto>(true, result);
         }
     }
 }

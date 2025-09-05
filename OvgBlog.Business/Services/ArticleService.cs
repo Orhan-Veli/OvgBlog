@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using OvgBlog.Business.Dto;
 using OvgBlog.DAL;
@@ -25,11 +26,11 @@ namespace OvgBlog.Business.Services
         OvgBlogContext context)
         : IArticleService
     {
-        public async Task<IResult<Article>> CreateAsync(CreateArticleDto dto, CancellationToken cancellationToken)
+        public async Task<IResult<ArticleDto>> CreateAsync(CreateArticleDto dto, CancellationToken cancellationToken)
         {
             if (dto == null)
             {
-                return new Result<Article>(false, ErrorMessages.DtoCannotBeNull, null);
+                return new Result<ArticleDto>(false, ErrorMessages.DtoCannotBeNull, null);
             }
                
             var article = new Article
@@ -51,9 +52,9 @@ namespace OvgBlog.Business.Services
                 await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
                 try
                 {
-                    await ValidateArticleCreate(dto, cancellationToken);
+                    await ValidateArticleCreateAsync(dto, cancellationToken);
                     await articleRepository.CreateAsync(article, cancellationToken);
-                    await CreateTagRelations(dto, article, cancellationToken);
+                    await CreateTagRelationsAsync(dto, article, cancellationToken);
                     await CreateFileAsync(dto, cancellationToken);
                     await CreateCategoryRelationAsync(dto, article, cancellationToken);
                     
@@ -65,7 +66,8 @@ namespace OvgBlog.Business.Services
                 }
             });
             
-            return new Result<Article>(true, article);
+            var articleDto = article.Adapt<ArticleDto>();
+            return new Result<ArticleDto>(true, articleDto);
         }
         
         public async Task<IResult<object>> DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -91,18 +93,18 @@ namespace OvgBlog.Business.Services
                     foreach (var item in tagRelationEntities)
                     {
                         item.IsDeleted = true;
-                        item.DeletedDate = DateTime.Now;
+                        item.DeletedDate = DateTime.UtcNow;
                     }
                     
                     var categoryEntities = await articleCategoryRelationRepository.GetAllAsync(cancellationToken, x => x.ArticleId == articleEntity.Id && !x.IsDeleted);
                     foreach (var item in categoryEntities)
                     {
                         item.IsDeleted = true;
-                        item.DeletedDate = DateTime.Now;
+                        item.DeletedDate = DateTime.UtcNow;
                     }
 
                     articleEntity.IsDeleted = true;
-                    articleEntity.DeletedDate = DateTime.Now;
+                    articleEntity.DeletedDate = DateTime.UtcNow;
                     
                     await articleRepository.UpdateAsync(articleEntity, cancellationToken);
                     await articleCategoryRelationRepository.UpdateBulkArticleCategoryRelationsAsync(categoryEntities, cancellationToken);
@@ -120,30 +122,34 @@ namespace OvgBlog.Business.Services
             return new Result<object>(true);
         }
 
-        public async Task<IResult<List<Article>>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<IResult<List<ArticleDto>>> GetAllAsync(ArticleFilterDto filterDto, CancellationToken cancellationToken)
         {
-            var list = await articleRepository.GetAllAsync(cancellationToken, x => !x.IsDeleted, x => x.User);
-            return new Result<List<Article>>(true, list);
+            var entities = await articleRepository.GetAllAsync(cancellationToken, x => !x.IsDeleted && filterDto.Ids.Contains(x.Id) && filterDto.UserIds.Contains(x.UserId), x => x.User);
+            var dto = entities.Adapt<List<ArticleDto>>();
+            
+            return new Result<List<ArticleDto>>(true, dto);
         }
 
-        public async Task<IResult<List<Article>>> GetByCategoryIdAsync(Guid categoryId,
+        public async Task<IResult<List<ArticleDto>>> GetByCategoryIdAsync(Guid categoryId,
             CancellationToken cancellationToken)
         {
             if (categoryId == Guid.Empty)
             {
-                return new Result<List<Article>>(false, ErrorMessages.IdIsNotValid);
+                throw new OvgBlogException(ErrorMessages.CategoryIsNotValid);
             }
 
             var result = await articleRepository.GetAllAsync(cancellationToken,
                 x => x.ArticleCategoryRelations.Any(c => c.CategoryId == categoryId));
-            return new Result<List<Article>>(true, result);
+            
+            var dto = result.Adapt<List<ArticleDto>>();
+            return new Result<List<ArticleDto>>(true, dto);
         }
 
-        public async Task<IResult<Article>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<IResult<ArticleDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
-                return new Result<Article>(false, ErrorMessages.IdIsNotValid);
+                throw new OvgBlogException(ErrorMessages.IdIsNotValid);
             }
 
             var expressions = new List<Expression<Func<Article, object>>>();
@@ -152,14 +158,15 @@ namespace OvgBlog.Business.Services
             var articleEntity =
                 await articleRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted, expressions);
             
-            return articleEntity == null ? new Result<Article>(false, ErrorMessages.ArticleIsNotFound) : new Result<Article>(true, articleEntity);
+            var dto = articleEntity?.Adapt<ArticleDto>() ?? throw new OvgBlogException(ErrorMessages.ArticleIsNotFound);
+            return new Result<ArticleDto>(true, dto);
         }
 
-        public async Task<IResult<Article>> GetBySeoUrlAsync(string seoUrl, CancellationToken cancellationToken)
+        public async Task<IResult<ArticleDto>> GetBySeoUrlAsync(string seoUrl, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(seoUrl))
             {
-                return new Result<Article>(false, ErrorMessages.FieldIsNotValid);
+                throw new OvgBlogException(ErrorMessages.IdIsNotValid);
             }
 
             var expressions = new List<Expression<Func<Article, object>>>
@@ -171,28 +178,27 @@ namespace OvgBlog.Business.Services
 
             var articleEntity = await articleRepository.GetAsync(cancellationToken,
                 x => x.SeoUrl == seoUrl && !x.IsDeleted, expressions);
-            return articleEntity == null
-                ? new Result<Article>(false, ErrorMessages.ArticleIsNotFound)
-                : new Result<Article>(true, articleEntity);
+            
+            var dto = articleEntity?.Adapt<ArticleDto>() ?? throw new OvgBlogException(ErrorMessages.ArticleIsNotFound);
+            return new Result<ArticleDto>(true, dto);
         }
 
         public async Task<IResult<ArticleDto>> UpdateAsync(UpdateArticleDto dto, CancellationToken cancellationToken)
         {
-            // if (article == null || string.IsNullOrEmpty(article.Title) || string.IsNullOrEmpty(article.SeoUrl))
-            // {
-            //     return new Result<Article>(false, ErrorMessages.ModelNotValid);
-            // }
-            //
-            // var articleEntity =
-            //     await articleRepository.GetAsync(cancellationToken, x => x.Id == article.Id && !x.IsDeleted);
-            // if (articleEntity == null)
-            // {
-            //     return new Result<Article>(false, ErrorMessages.ArticleIsNotFound);
-            // }
-            //
-            // article.UpdatedDate = DateTime.Now;
-            // articleEntity = await articleRepository.UpdateAsync(article, cancellationToken);
-            return new Result<ArticleDto>(true);
+            if(dto == null) throw new OvgBlogException(ErrorMessages.DtoCannotBeNull);
+            
+            var entity= await articleRepository.GetAsync(cancellationToken, x => x.Id == dto.Id && !x.IsDeleted);
+            if (entity == null)
+            {
+                throw new OvgBlogException(ErrorMessages.ArticleIsNotFound);
+            }
+
+            entity = dto.Adapt<Article>();
+            entity.UpdatedDate = DateTime.UtcNow;
+            var result  = await articleRepository.UpdateAsync(entity, cancellationToken);
+            
+            var resultDto = result.Adapt<ArticleDto>();
+            return new Result<ArticleDto>(true, resultDto);
         }
 
         #region Private methods
@@ -207,11 +213,9 @@ namespace OvgBlog.Business.Services
             await dto.FileImageUrl.CopyToAsync(fileStream, cancellationToken);
         }
 
-        private async Task CreateTagRelations(CreateArticleDto dto, Article article,
+        private async Task CreateTagRelationsAsync(CreateArticleDto dto, Article article,
             CancellationToken cancellationToken)
         {
-            //ToDo Add in the validation!
-
             var tagNames = dto.TagName.Split(",").ToList();
             var tags = await tagRepository.GetAllTagsByNamesAsync(tagNames, cancellationToken);
             var creatableTags = new List<Tag>();
@@ -223,7 +227,7 @@ namespace OvgBlog.Business.Services
                 {
                     Id = Guid.NewGuid(),
                     ArticleId = article.Id,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     IsActive = true
                 };
 
@@ -241,7 +245,7 @@ namespace OvgBlog.Business.Services
                         Id = tagId,
                         Name = tag,
                         SeoUrl = tag.ReplaceSeoUrl(),
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = DateTime.UtcNow,
                         IsActive = true
                     });
                     creatableTagRelations.Add(tagRelation);
@@ -261,14 +265,14 @@ namespace OvgBlog.Business.Services
                 Id = Guid.NewGuid(), 
                 ArticleId = article.Id,
                 CategoryId = dto.CategoryId,
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTime.UtcNow,
                 IsActive = true
             };
             
             await articleCategoryRelationRepository.CreateAsync(entity, cancellationToken);   
         }
         
-        private async Task ValidateArticleCreate(CreateArticleDto dto, CancellationToken cancellationToken)
+        private async Task ValidateArticleCreateAsync(CreateArticleDto dto, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(dto.Title) || string.IsNullOrEmpty(dto.SeoUrl))
             {

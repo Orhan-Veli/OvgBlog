@@ -43,7 +43,7 @@ namespace OvgBlog.UI.Controllers
             {
                 return RedirectToAction("Index");
             }
-            var categoryResult = await _categoryService.CategoryBySeoUrlAsync(seoUrl, cancellationToken);
+            var categoryResult = await _categoryService.GetCategoryBySeoUrlAsync(seoUrl, cancellationToken);
             if (categoryResult == null || categoryResult.Data == null || !categoryResult.IsSuccess)
             {
                 return RedirectToAction("Index");

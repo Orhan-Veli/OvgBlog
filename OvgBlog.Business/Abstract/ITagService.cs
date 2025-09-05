@@ -5,19 +5,20 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using OvgBlog.Business.Dto;
 
 namespace OvgBlog.Business.Abstract
 {
     public interface ITagService
     {
-        Task<IResult<Tag>> CreateAsync(Tag tag, CancellationToken cancellationToken);
+        Task<IResult<TagDto>> CreateAsync(CreateTagDto dto, CancellationToken cancellationToken);
         Task<IResult<object>> DeleteAsync(Guid id, CancellationToken cancellationToken);
-        Task<IResult<Tag>> UpdateAsync(Tag tag, CancellationToken cancellationToken);
-        Task<IResult<IEnumerable<Tag>>> GetAllAsync(CancellationToken cancellationToken);
-        Task<IResult<Tag>> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<IResult<Tag>> FindIdByNameAsync(string name, CancellationToken cancellationToken);
+        Task<IResult<TagDto>> UpdateAsync(UpdateTagDto dto, CancellationToken cancellationToken);
+        Task<IResult<IEnumerable<TagDto>>> GetAllAsync(TagFilterDto filterDto, CancellationToken cancellationToken);
+        Task<IResult<TagDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<IResult<TagDto>> FindIdByNameAsync(string name, CancellationToken cancellationToken);
 
-        Task<IResult<IEnumerable<Tag>>> GetByIdsAsync(List<Guid> ids, CancellationToken cancellationToken);
+        Task<IResult<IEnumerable<TagDto>>> GetByIdsAsync(List<Guid> ids, CancellationToken cancellationToken);
 
     }
 }

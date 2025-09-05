@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Mapster;
+using OvgBlog.Business.Dto.Comment;
+using OvgBlog.DAL.Helpers;
 
 namespace OvgBlog.Business.Services
 {
@@ -19,84 +22,104 @@ namespace OvgBlog.Business.Services
             _commentRepository = commentRepository;
             _articleRepository = articleRepository;
         }
-        public async Task<IResult<Comment>> CreateAsync(Comment comment, CancellationToken cancellationToken)
+        public async Task<IResult<CommentDto>> CreateAsync(CreateCommentDto dto, CancellationToken cancellationToken)
         {
-            if (comment == null || string.IsNullOrEmpty(comment.Name) || string.IsNullOrEmpty(comment.Body) || comment.ArticleId == Guid.Empty)
+            if (dto == null)
             {
-                return new Result<Comment>(false, ErrorMessages.ModelNotValid);
+                throw new OvgBlogException(ErrorMessages.DtoCannotBeNull);
             }
-            var articleEntity = _articleRepository.GetAsync(cancellationToken, x => x.Id == comment.ArticleId && !x.IsDeleted);
+            
+            var articleEntity = _articleRepository.GetAsync(cancellationToken, x => x.Id == dto.ArticleId && !x.IsDeleted);
             if (articleEntity == null)
             {
-                return new Result<Comment>(false, ErrorMessages.CommentNotFound);
+                throw new OvgBlogException(ErrorMessages.CommentNotFound);
             }
-            comment.Id = Guid.NewGuid();
-            comment.CreatedDate = DateTime.Now;
-            await _commentRepository.CreateAsync(comment, cancellationToken);
-            return new Result<Comment>(true, comment);
+
+            var entity = dto.Adapt<Comment>();
+            entity.CreatedDate = DateTime.UtcNow;
+            
+            await _commentRepository.CreateAsync(entity, cancellationToken);
+            
+            var result = entity.Adapt<CommentDto>();
+            return new Result<CommentDto>(true, result);
         }
 
         public async Task<IResult<object>> DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
-                return new Result<object>(false, ErrorMessages.IdIsNotValid);
+                throw new OvgBlogException(ErrorMessages.IdIsNotValid);
             }
-            var commentEntity = await _commentRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
-            if (commentEntity == null)
+            
+            var entity = await _commentRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
+            if (entity == null)
             {
-                return new Result<object>(false, ErrorMessages.CommentNotFound);
+                throw new OvgBlogException(ErrorMessages.CommentNotFound);
             }
+            
             var articleEntity = _articleRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
             if (articleEntity == null)
             {
-                return new Result<object>(false, ErrorMessages.CommentNotFound);
+                throw new OvgBlogException(ErrorMessages.ArticleIsNotFound);
             }
-            commentEntity.IsDeleted = true;
-            commentEntity.DeletedDate = DateTime.Now;
-            await _commentRepository.UpdateAsync(commentEntity, cancellationToken);
+             
+            entity.IsDeleted = true;
+            entity.DeletedDate = DateTime.UtcNow;
+            await _commentRepository.UpdateAsync(entity, cancellationToken);
             return new Result<object>(true);
         }
 
-        public async Task<IResult<IEnumerable<Comment>>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<IResult<IEnumerable<CommentDto>>> GetAllAsync(CommentFilterDto filterDto, CancellationToken cancellationToken)
         {
-            var list = await _commentRepository.GetAllAsync(cancellationToken, x => !x.IsDeleted);
-            return new Result<IEnumerable<Comment>>(true, list);
+            var entities = await _commentRepository.GetAllAsync(cancellationToken, x => !x.IsDeleted && filterDto.Ids.Contains(x.Id) && filterDto.ArticleIds.Contains(x.ArticleId));
+            
+            var result = entities.Adapt<IEnumerable<CommentDto>>();
+            
+            return new Result<IEnumerable<CommentDto>>(true, result);
         }
 
-        public async Task<IResult<Comment>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<IResult<CommentDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
-                return new Result<Comment>(false, ErrorMessages.IdIsNotValid);
+               throw new OvgBlogException(ErrorMessages.IdIsNotValid);
             }
-            var commentEntity = await _commentRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
-            if (commentEntity == null)
+            
+            var entity = await _commentRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
+            if (entity == null)
             {
-                return new Result<Comment>(false, ErrorMessages.CommentNotFound);
+                throw new OvgBlogException(ErrorMessages.CommentNotFound);
             }
-            return new Result<Comment>(true, commentEntity);
+            
+            var result = entity.Adapt<CommentDto>();
+            
+            return new Result<CommentDto>(true, result);
         }
 
-        public async Task<IResult<Comment>> UpdateAsync(Comment comment, CancellationToken cancellationToken)
+        public async Task<IResult<CommentDto>> UpdateAsync(UpdateCommentDto dto, CancellationToken cancellationToken)
         {
-            if (comment == null || string.IsNullOrEmpty(comment.Name) || string.IsNullOrEmpty(comment.Body) || comment.ArticleId == Guid.Empty)
+            if (dto == null)
             {
-                return new Result<Comment>(false, ErrorMessages.ModelNotValid);
+                throw new OvgBlogException(ErrorMessages.DtoCannotBeNull);
             }
-            var commentEntity = await _commentRepository.GetAsync(cancellationToken, x => x.Id == comment.Id && !x.IsDeleted);
-            if (commentEntity == null)
+            
+            var entity = await _commentRepository.GetAsync(cancellationToken, x => x.Id == dto.Id && !x.IsDeleted);
+            if (entity == null)
             {
-                return new Result<Comment>(false, ErrorMessages.CommentNotFound);
+                throw new OvgBlogException(ErrorMessages.CommentNotFound);
             }
-            var articleEntity = await _articleRepository.GetAsync(cancellationToken, x => x.Id == comment.ArticleId && !x.IsDeleted);
+            
+            var articleEntity = await _articleRepository.GetAsync(cancellationToken, x => x.Id == entity.ArticleId && !x.IsDeleted);
             if (articleEntity == null)
             {
-                return new Result<Comment>(false, ErrorMessages.CommentNotFound);
+                throw new OvgBlogException(ErrorMessages.ArticleIsNotFound);
             }
-            comment.UpdatedDate = DateTime.Now;
-            commentEntity = await _commentRepository.UpdateAsync(comment, cancellationToken);
-            return new Result<Comment>(true, commentEntity);
+            
+            entity.UpdatedDate = DateTime.UtcNow;
+            entity = await _commentRepository.UpdateAsync(entity, cancellationToken);
+            
+            var result = entity.Adapt<CommentDto>();
+            return new Result<CommentDto>(true, result);
 
         }
     }

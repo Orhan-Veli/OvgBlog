@@ -5,6 +5,7 @@
         public static string ModelNotValid = "Model is not valid.";
         public static string UserNotFound = "User not found.";
         public static string IdIsNotValid = "Id is not valid";
+        public static string CategoryIsNotValid = "CategoryId is not valid";
         public static string FieldIsNotValid = "Field is not valid";
         public static string ArticleIsNotFound="Article is not found.";
         public static string CategoryNotFound="Category is not found.";

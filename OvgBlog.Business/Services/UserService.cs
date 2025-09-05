@@ -7,26 +7,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Mapster;
+using OvgBlog.Business.Dto.User;
+using OvgBlog.DAL.Helpers;
 
 namespace OvgBlog.Business.Services
 {
-    public class UserService : IUserService
+    public class UserService(IEntityRepository<User> userRepository) : IUserService
     {
-        readonly IEntityRepository<User> _userRepository;
-        public UserService(IEntityRepository<User> userRepository)
+        public async Task<IResult<UserDto>> CreateAsync(CreateUserDto dto, CancellationToken cancellationToken)
         {
-            _userRepository = userRepository;
-        }
-        public async Task<IResult<User>> CreateAsync(User user, CancellationToken cancellationToken)
-        {
-            if (user == null || string.IsNullOrEmpty(user.Name) || string.IsNullOrEmpty(user.Password))
+            if (dto == null)
             {
-                return new Result<User>(false, ErrorMessages.ModelNotValid);
+                throw new OvgBlogException(ErrorMessages.DtoCannotBeNull);
             }
-            user.Id = Guid.NewGuid();
-            user.CreatedDate = DateTime.Now;
-            await _userRepository.CreateAsync(user, cancellationToken);
-            return new Result<User>(true, user);
+
+            var entity = dto.Adapt<User>();
+            entity.CreatedDate = DateTime.UtcNow;
+            await userRepository.CreateAsync(entity, cancellationToken);
+            
+            var result = entity.Adapt<UserDto>();
+            return new Result<UserDto>(true, result);
 
         }
 
@@ -34,30 +35,37 @@ namespace OvgBlog.Business.Services
         {
             if (id == Guid.Empty)
             {
-                return new Result<object>(false, ErrorMessages.IdIsNotValid);
+                throw new OvgBlogException(ErrorMessages.IdIsNotValid);
             }
-            var userEntity = await _userRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
+            
+            var userEntity = await userRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
             if (userEntity == null)
             {
-                return new Result<object>(false, ErrorMessages.UserNotFound);
+                throw new OvgBlogException(ErrorMessages.UserNotFound);
             }
+            
             userEntity.IsDeleted = true;
-            userEntity.DeletedDate = DateTime.Now;
-            await _userRepository.UpdateAsync(userEntity, cancellationToken);
+            userEntity.DeletedDate = DateTime.UtcNow;
+            await userRepository.UpdateAsync(userEntity, cancellationToken);
             return new Result<object>(true);
+        }
+
+        public async Task<IResult<IEnumerable<UserDto>>> GetAllAsync(UserFilterDto filterDto, CancellationToken cancellationToken)
+        {
+            var entites = await userRepository.GetAllAsync(cancellationToken, x => !x.IsDeleted && filterDto.Ids.Contains(x.Id));
+            
+            var result = entites.Adapt<IEnumerable<UserDto>>();
+            return new Result<IEnumerable<UserDto>>(true, result);
         }
 
         public async Task<IResult<bool>> CheckUserAsync(string userName, string password, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+            var user = await userRepository.GetAsync(cancellationToken, x => x.Name == userName || x.Email == userName);
+            if (user == null)
             {
-                return new Result<bool>(false, ErrorMessages.UserNotFound);
+                 throw new OvgBlogException(ErrorMessages.UserNotFound);
             }
-            var user = await _userRepository.GetAsync(cancellationToken, x => x.Name == userName || x.Email == userName);
-            if (user == null || user.Name == null || user.Password == null)
-            {
-                return new Result<bool>(false, ErrorMessages.UserNotFound);
-            }
+            
             if (user.Password != password)
             {
                 return new Result<bool>(false, ErrorMessages.PasswordIsWrong);
@@ -65,34 +73,40 @@ namespace OvgBlog.Business.Services
             return new Result<bool>(true);
         }
 
-        public async Task<IResult<User>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<IResult<UserDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             if (id == Guid.Empty)
             {
-                return new Result<User>(false, ErrorMessages.IdIsNotValid);
+                throw new OvgBlogException(ErrorMessages.IdIsNotValid);
             }
-            var userEntity = await _userRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
-            if (userEntity == null)
+            var entity = await userRepository.GetAsync(cancellationToken, x => x.Id == id && !x.IsDeleted);
+            if (entity == null)
             {
-                return new Result<User>(false, ErrorMessages.UserNotFound);
+               throw new OvgBlogException(ErrorMessages.UserNotFound);
             }
-            return new Result<User>(true, userEntity);
+            
+            var result = entity.Adapt<UserDto>();
+            return new Result<UserDto>(true, result);
         }
 
-        public async Task<IResult<User>> UpdateAsync(User user, CancellationToken cancellationToken)
+        public async Task<IResult<UserDto>> UpdateAsync(UpdateUserDto user, CancellationToken cancellationToken)
         {
-            if (user == null || string.IsNullOrEmpty(user.Name) || string.IsNullOrEmpty(user.Password))
+            if (user == null)
             {
-                return new Result<User>(false, ErrorMessages.ModelNotValid);
+                return new Result<UserDto>(false, ErrorMessages.ModelNotValid);
             }
-            var userEntity = await _userRepository.GetAsync(cancellationToken, x => x.Id == user.Id && !x.IsDeleted);
-            if (userEntity == null)
+            
+            var entity = await userRepository.GetAsync(cancellationToken, x => x.Id == user.Id && !x.IsDeleted);
+            if (entity == null)
             {
-                return new Result<User>(false, ErrorMessages.UserNotFound);
+                return new Result<UserDto>(false, ErrorMessages.UserNotFound);
             }
-            user.UpdatedDate = DateTime.Now;
-            userEntity = await _userRepository.UpdateAsync(user, cancellationToken);
-            return new Result<User>(true, userEntity);
+            
+            entity.UpdatedDate = DateTime.UtcNow;
+            entity = await userRepository.UpdateAsync(entity, cancellationToken);
+            
+            var result = entity.Adapt<UserDto>();
+            return new Result<UserDto>(true, result);
         }
     }
 }

@@ -88,7 +88,7 @@ namespace OvgBlog.UI.Controllers
                 return Json(new JsonResultModel<Category>(false, "Tüm alanları doldurun."));
             }
             categoryAddViewModel.SeoUrl = categoryAddViewModel.SeoUrl.ReplaceSeoUrl();
-            var result = await _categoryService.CategoryBySeoUrlAsync(categoryAddViewModel.SeoUrl, cancellationToken);
+            var result = await _categoryService.GetCategoryBySeoUrlAsync(categoryAddViewModel.SeoUrl, cancellationToken);
             if (result.IsSuccess)
             {
                 return Json(new JsonResultModel<Category>(false, "SeoUrl zaten bulunuyor."));
@@ -220,12 +220,12 @@ namespace OvgBlog.UI.Controllers
             foreach (var item in result.Data.ArticleCategoryRelations)
             {
                 item.IsDeleted = true;
-                item.DeletedDate = DateTime.Now;
+                item.DeletedDate = DateTime.UtcNow;
             }
             result.Data.ArticleCategoryRelations.Add(new ArticleCategoryRelation
             {
                 CategoryId = articleUpdateViewModel.SelectedCategoryId,
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTime.UtcNow,
                 Id = Guid.NewGuid(),
                 ArticleId = result.Data.Id
             });
